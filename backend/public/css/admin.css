@@ -360,3 +360,148 @@
         padding: 0.5rem;
     }
 }
+
+/* ================================
+   Toast Notification Component
+   ================================ */
+
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    min-width: 20rem;
+    max-width: 28rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f3f4f6;
+    overflow: hidden;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast.hiding {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+}
+
+.toast-icon {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-icon-success {
+    background: #dcfce7;
+}
+
+.toast-icon-success svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #16a34a;
+}
+
+.toast-icon-error {
+    background: #fee2e2;
+}
+
+.toast-icon-error svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #dc2626;
+}
+
+.toast-icon-info {
+    background: #dbeafe;
+}
+
+.toast-icon-info svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #2563eb;
+}
+
+.toast-icon-warning {
+    background: #fef3c7;
+}
+
+.toast-icon-warning svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #ca8a04;
+}
+
+.toast-message {
+    flex: 1;
+}
+
+.toast-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.toast-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.125rem;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    color: #9ca3af;
+    transition: color 0.2s;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.toast-close:hover {
+    color: #4b5563;
+    background: #f3f4f6;
+}
+
+.toast-close svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+@media (max-width: 640px) {
+    .toast-container {
+        left: 1rem;
+        right: 1rem;
+        top: 1rem;
+    }
+
+    .toast {
+        min-width: 0;
+    }
+}

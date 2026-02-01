@@ -216,23 +216,26 @@
             </div>
 
             {{-- Logout Confirmation Modal --}}
-            <div id="logout-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
-                <div id="logout-modal-overlay" class="absolute inset-0 bg-black/50"></div>
-                <div class="relative z-10 w-full max-w-xs rounded-lg bg-white p-5 shadow-xl border-2 border-gray-300">
-                    <div class="flex items-start gap-3">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-red-50 text-red-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A3.75 3.75 0 0012 1.5h0A3.75 3.75 0 008.25 5.25V9m-.75 12h9a2.25 2.25 0 002.25-2.25V11.25A2.25 2.25 0 0016.5 9h-9a2.25 2.25 0 00-2.25 2.25v7.5A2.25 2.25 0 007.5 21z"/>
+            <div id="logout-modal" class="modal" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                {{-- Background backdrop --}}
+                <div id="logout-modal-overlay" class="modal-backdrop"></div>
+
+                {{-- Modal content --}}
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-icon">
+                            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A3.75 3.75 0 0012 1.5h0A3.75 3.75 0 008.25 5.25V9m-.75 12h9a2.25 2.25 0 002.25-2.25V11.25A2.25 2.25 0 0016.5 9h-9a2.25 2.25 0 00-2.25 2.25v7.5A2.25 2.25 0 007.5 21z" />
                             </svg>
                         </div>
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-900">Confirm sign out</h3>
-                            <p class="mt-0.5 text-xs text-gray-500">You will be returned to the login page.</p>
+                        <div class="modal-body">
+                            <h3 class="modal-title" id="modal-title">Sign out</h3>
+                            <p class="modal-description">Are you sure you want to sign out? You will be returned to the login page.</p>
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center justify-end gap-2">
-                        <button type="button" data-logout-close class="rounded-md border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">No</button>
-                        <button id="logout-confirm" type="button" class="rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700">Yes</button>
+                    <div class="modal-footer">
+                        <button type="button" data-logout-close class="btn-secondary">Cancel</button>
+                        <button id="logout-confirm" type="button" class="btn-primary">Yes, sign out</button>
                     </div>
                 </div>
             </div>
@@ -244,8 +247,28 @@
         </div>
     </div>
 
+    {{-- Toast Container --}}
+    <div id="toast-container" class="toast-container"></div>
+
     @stack('scripts')
     {{-- Admin Panel JavaScript --}}
     <script src="{{ asset('js/admin.js') }}"></script>
+
+    {{-- Show success/error toasts from session --}}
+    @if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showToast('{{ session('success') }}', 'success', 'Success', 4000);
+            });
+        </script>
+    @endif
+
+    @if(session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showToast('{{ session('error') }}', 'error', 'Error', 5000);
+            });
+        </script>
+    @endif
 </body>
 </html>

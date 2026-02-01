@@ -135,4 +135,214 @@
     .stat-trend-down {
         @apply text-red-600;
     }
+
+    /* Modal component */
+    .modal {
+        @apply fixed inset-0 z-[100] hidden items-center justify-center p-4;
+    }
+
+    .modal.open {
+        @apply flex;
+    }
+
+    .modal-backdrop {
+        @apply absolute inset-0 bg-gray-900/75;
+    }
+
+    .modal-content {
+        @apply relative z-10 w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden;
+    }
+
+    .modal-header {
+        @apply px-6 py-5 flex items-start gap-4;
+    }
+
+    .modal-icon {
+        @apply flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100;
+    }
+
+    .modal-icon svg {
+        @apply h-6 w-6 text-indigo-600;
+    }
+
+    .modal-body {
+        @apply flex-1;
+    }
+
+    .modal-title {
+        @apply text-lg font-semibold text-gray-900;
+    }
+
+    .modal-description {
+        @apply mt-2 text-sm text-gray-500;
+    }
+
+    .modal-footer {
+        @apply bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end sm:gap-3;
+    }
+
+    /* Login page component */
+    .auth-container {
+        @apply min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4;
+    }
+
+    .auth-card {
+        @apply w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden;
+    }
+
+    .auth-header {
+        @apply px-8 pt-8 pb-6 text-center;
+    }
+
+    .auth-logo {
+        @apply w-14 h-14 mx-auto mb-4 flex items-center justify-center rounded-2xl bg-indigo-100;
+    }
+
+    .auth-logo svg {
+        @apply w-8 h-8 text-indigo-600;
+    }
+
+    .auth-title {
+        @apply text-2xl font-bold text-gray-900;
+    }
+
+    .auth-subtitle {
+        @apply text-sm text-gray-500 mt-2;
+    }
+
+    .auth-body {
+        @apply px-8 pb-8;
+    }
+
+    .auth-form-group {
+        @apply space-y-2;
+    }
+
+    .auth-label {
+        @apply block text-sm font-medium text-gray-700;
+    }
+
+    .auth-input {
+        @apply w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all;
+    }
+
+    .auth-input-error {
+        @apply border-red-300 focus:border-red-500 focus:ring-red-500;
+    }
+
+    .auth-error-text {
+        @apply text-red-600 text-xs mt-1;
+    }
+
+    .auth-checkbox {
+        @apply w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2;
+    }
+
+    .auth-checkbox-label {
+        @apply text-sm text-gray-600 ml-2;
+    }
+
+    .auth-btn {
+        @apply w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all;
+    }
+
+    .auth-link {
+        @apply text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors;
+    }
+
+    .auth-alert {
+        @apply p-4 rounded-xl text-sm mb-6;
+    }
+
+    .auth-alert-error {
+        @apply bg-red-50 text-red-800 border border-red-200;
+    }
+
+    /* Toast component */
+    .toast-container {
+        @apply fixed top-4 right-4 z-[200] flex flex-col gap-3 pointer-events-none;
+    }
+
+    .toast {
+        @apply pointer-events-auto min-w-[320px] max-w-md bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden transform transition-all duration-300 ease-out;
+        @apply translate-x-full opacity-0;
+    }
+
+    .toast.show {
+        @apply translate-x-0 opacity-100;
+    }
+
+    .toast.hiding {
+        @apply translate-x-full opacity-0;
+    }
+
+    .toast-icon {
+        @apply flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center;
+    }
+
+    .toast-icon-success {
+        @apply bg-green-100;
+    }
+
+    .toast-icon-success svg {
+        @apply w-5 h-5 text-green-600;
+    }
+
+    .toast-icon-error {
+        @apply bg-red-100;
+    }
+
+    .toast-icon-error svg {
+        @apply w-5 h-5 text-red-600;
+    }
+
+    .toast-icon-info {
+        @apply bg-blue-100;
+    }
+
+    .toast-icon-info svg {
+        @apply w-5 h-5 text-blue-600;
+    }
+
+    .toast-icon-warning {
+        @apply bg-yellow-100;
+    }
+
+    .toast-icon-warning svg {
+        @apply w-5 h-5 text-yellow-600;
+    }
+
+    .toast-content {
+        @apply flex items-center gap-3 p-4;
+    }
+
+    .toast-message {
+        @apply flex-1;
+    }
+
+    .toast-title {
+        @apply text-sm font-semibold text-gray-900;
+    }
+
+    .toast-description {
+        @apply text-sm text-gray-500 mt-0.5;
+    }
+
+    .toast-close {
+        @apply flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100;
+    }
+
+    .toast-close svg {
+        @apply w-4 h-4;
+    }
+
+    @media (max-width: 640px) {
+        .toast-container {
+            @apply left-4 right-4 top-4;
+        }
+
+        .toast {
+            @apply min-w-0;
+        }
+    }
 }
