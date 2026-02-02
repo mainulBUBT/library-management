@@ -11,30 +11,31 @@
     <p class="text-gray-500 mt-1">Update member information</p>
 </div>
 
-<div class="max-w-2xl">
+<div class="w-full">
+    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.members.update', $member) }}" class="card">
         @csrf
         @method('PUT')
 
         <div class="card-body space-y-6">
-            <!-- Name -->
-            <div>
-                <label class="form-label">Full Name <span class="text-red-500">*</span></label>
-                <input type="text" name="name" class="form-input" required
-                       value="{{ old('name', $member->user->name) }}" autofocus>
-                @error('name')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Email -->
-            <div>
-                <label class="form-label">Email <span class="text-red-500">*</span></label>
-                <input type="email" name="email" class="form-input" required
-                       value="{{ old('email', $member->user->email) }}">
-                @error('email')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
+            <!-- Name & Email -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <label class="form-label">Full Name <span class="text-red-500">*</span></label>
+                    <input type="text" name="name" class="form-input" required
+                           value="{{ old('name', $member->user->name) }}" autofocus>
+                    @error('name')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="form-label">Email <span class="text-red-500">*</span></label>
+                    <input type="email" name="email" class="form-input" required
+                           value="{{ old('email', $member->user->email) }}">
+                    @error('email')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <!-- Phone & Member Type -->
@@ -104,5 +105,6 @@
             </div>
         </div>
     </form>
+    </div>
 </div>
 @endsection

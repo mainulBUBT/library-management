@@ -11,33 +11,36 @@
     <p class="text-gray-500 mt-1">Create a new catalog category</p>
 </div>
 
-<div class="max-w-2xl">
+<div class="w-full">
+    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.categories.store') }}" class="card">
         @csrf
 
         <div class="card-body space-y-6">
-            <div>
-                <label class="form-label">Name <span class="text-red-500">*</span></label>
-                <input type="text" name="name" class="form-input" required
-                       value="{{ old('name') }}" autofocus>
-                @error('name')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
-                <label class="form-label">Parent Category</label>
-                <select name="parent_id" class="form-select">
-                    <option value="">None (Top Level)</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}" {{ old('parent_id') == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('parent_id')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
+            <!-- Name & Parent Category -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <label class="form-label">Name <span class="text-red-500">*</span></label>
+                    <input type="text" name="name" class="form-input" required
+                           value="{{ old('name') }}" autofocus>
+                    @error('name')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="form-label">Parent Category</label>
+                    <select name="parent_id" class="form-select">
+                        <option value="">None (Top Level)</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('parent_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('parent_id')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div>
@@ -62,5 +65,6 @@
             <button type="submit" class="btn-primary">Create Category</button>
         </div>
     </form>
+    </div>
 </div>
 @endsection

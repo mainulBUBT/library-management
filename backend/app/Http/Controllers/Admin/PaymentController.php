@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fine;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
@@ -13,21 +14,56 @@ class PaymentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = \App\Models\Payment::with(['fine', 'member.user', 'receivedBy.user']);
+        $query = Payment::with(['fine', 'member.user', 'receivedBy.user']);
 
         // Filter by date
         if ($request->filled('from_date')) {
-            $query->where('payment_date', '>=', $request->from_date);
+            $query->whereDate('payment_date', '>=', $request->from_date);
         }
         if ($request->filled('to_date')) {
-            $query->where('payment_date', '<=', $request->to_date);
+            $query->whereDate('payment_date', '<=', $request->to_date);
         }
 
-        $payments = $query->orderBy('payment_date', 'desc')->paginate(15);
+        // Filter by method
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
 
-        $totalAmount = \App\Models\Payment::sum('amount');
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('receipt_number', 'like', "%{$search}%")
+                    ->orWhere('transaction_reference', 'like', "%{$search}%")
+                    ->orWhereHas('member', function ($memberQuery) use ($search) {
+                        $memberQuery->where('member_code', 'like', "%{$search}%")
+                            ->orWhereHas('user', function ($userQuery) use ($search) {
+                                $userQuery->where('name', 'like', "%{$search}%")
+                                    ->orWhere('email', 'like', "%{$search}%");
+                            });
+                    });
 
-        return view('admin.payments.index', compact('payments', 'totalAmount'));
+                if (ctype_digit($search)) {
+                    $q->orWhere('fine_id', (int) $search);
+                }
+            });
+        }
+
+        $filteredAmount = (clone $query)->sum('amount');
+        $paymentCount = (clone $query)->count();
+        $averageAmount = $paymentCount > 0 ? ($filteredAmount / $paymentCount) : 0;
+
+        $payments = $query->orderBy('payment_date', 'desc')->paginate(15)->withQueryString();
+
+        $totalAmount = Payment::sum('amount');
+
+        return view('admin.payments.index', compact(
+            'payments',
+            'totalAmount',
+            'filteredAmount',
+            'paymentCount',
+            'averageAmount'
+        ));
     }
 
     /**

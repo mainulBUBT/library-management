@@ -11,7 +11,8 @@
     <p class="text-gray-500 mt-1">Update author information</p>
 </div>
 
-<div class="max-w-2xl">
+<div class="w-full">
+    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.authors.update', $author) }}" class="card">
         @csrf
         @method('PUT')
@@ -69,5 +70,6 @@
             <button type="submit" class="btn-primary">Update Author</button>
         </div>
     </form>
+    </div>
 </div>
 @endsection

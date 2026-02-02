@@ -11,7 +11,8 @@
     <p class="text-gray-500 mt-1">Update resource information</p>
 </div>
 
-<div class="max-w-3xl">
+<div class="w-full">
+    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.resources.update', $resource) }}" class="card">
         @csrf
         @method('PUT')
@@ -165,5 +166,6 @@
             </div>
         </div>
     </form>
+    </div>
 </div>
 @endsection

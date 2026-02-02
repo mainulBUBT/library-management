@@ -98,6 +98,7 @@
         </div>
         <div class="card-body p-0">
             @if($recentLoans->count() > 0)
+                <div class="table-wrapper">
                 <table class="table">
                     <thead>
                         <tr>
@@ -125,6 +126,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             @else
                 <div class="p-6 text-center text-gray-500">No loans yet</div>
             @endif
@@ -139,6 +141,7 @@
         </div>
         <div class="card-body p-0">
             @if($recentMembers->count() > 0)
+                <div class="table-wrapper">
                 <table class="table">
                     <thead>
                         <tr>
@@ -169,6 +172,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             @else
                 <div class="p-6 text-center text-gray-500">No members yet</div>
             @endif

@@ -95,6 +95,7 @@
                 <h2 class="card-title">Copies ({{ $resource->copies->count() }})</h2>
             </div>
             <div class="card-body p-0">
+                <div class="table-wrapper">
                 <table class="table">
                     <thead class="table-head">
                         <tr>
@@ -135,6 +136,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>

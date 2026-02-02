@@ -25,9 +25,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Home page
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [AuthController::class, 'showLoginForm'])->name('home');
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

@@ -17,6 +17,7 @@
 <!-- Categories Table -->
 <div class="card">
     <div class="overflow-x-auto">
+        <div class="table-wrapper">
         <table class="table">
             <thead class="table-head">
                 <tr>
@@ -96,6 +97,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 
     <!-- Pagination -->

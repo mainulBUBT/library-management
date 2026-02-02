@@ -11,7 +11,8 @@
     <p class="text-gray-500 mt-1">Add a new item to the library catalog</p>
 </div>
 
-<div class="max-w-3xl">
+<div class="w-full">
+    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.resources.store') }}" class="card">
         @csrf
 
@@ -161,5 +162,6 @@
             <button type="submit" class="btn-primary">Create Resource</button>
         </div>
     </form>
+    </div>
 </div>
 @endsection

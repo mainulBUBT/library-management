@@ -11,43 +11,48 @@
     <p class="text-gray-500 mt-1">Checkout an item to a member</p>
 </div>
 
-<div class="max-w-2xl">
+<div class="w-full">
+    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.loans.store') }}" class="card">
         @csrf
 
         <div class="card-body space-y-6">
-            <!-- Member Code -->
-            <div>
-                <label class="form-label">Member Code <span class="text-red-500">*</span></label>
-                <input type="text" name="member_code" class="form-input" required
-                       value="{{ old('member_code') }}" placeholder="e.g. MEM202500001">
-                @error('member_code')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
+            <!-- Member Code, Barcode & Loan Period -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Member Code -->
+                <div>
+                    <label class="form-label">Member Code <span class="text-red-500">*</span></label>
+                    <input type="text" name="member_code" class="form-input" required
+                           value="{{ old('member_code') }}" placeholder="e.g. MEM202500001">
+                    @error('member_code')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Barcode -->
+                <div>
+                    <label class="form-label">Copy Barcode <span class="text-red-500">*</span></label>
+                    <input type="text" name="barcode" class="form-input" required
+                           value="{{ old('barcode') }}" placeholder="e.g. 10001">
+                    @error('barcode')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Loan Period (Optional) -->
+                <div>
+                    <label class="form-label">Loan Period (Days)</label>
+                    <input type="number" name="loan_period_days" class="form-input"
+                           value="{{ old('loan_period_days') }}" min="1" max="365" placeholder="Default">
+                    @error('loan_period_days')
+                        <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <!-- Barcode -->
-            <div>
-                <label class="form-label">Copy Barcode <span class="text-red-500">*</span></label>
-                <input type="text" name="barcode" class="form-input" required
-                       value="{{ old('barcode') }}" placeholder="e.g. 10001">
-                @error('barcode')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <!-- Loan Period (Optional) -->
-            <div>
-                <label class="form-label">Loan Period (Days)</label>
-                <input type="number" name="loan_period_days" class="form-input"
-                       value="{{ old('loan_period_days') }}" min="1" max="365" placeholder="Leave empty for default">
-                @error('loan_period_days')
-                    <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                @enderror
-                <p class="text-xs text-gray-500 mt-1">
-                    Default loan periods: Students (14 days), Teachers (30 days), Staff (14 days), Public (7 days)
-                </p>
-            </div>
+            <p class="text-xs text-gray-500">
+                Default loan periods: Students (14 days), Teachers (30 days), Staff (14 days), Public (7 days)
+            </p>
         </div>
 
         <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-3 rounded-b-xl">
@@ -75,6 +80,7 @@
                 <span class="font-medium">$0.50</span>
             </div>
         </div>
+    </div>
     </div>
 </div>
 @endsection

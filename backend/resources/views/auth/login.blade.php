@@ -91,7 +91,7 @@
     @if(session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                showToast('{{ session('success') }}', 'success', 'Welcome back!', 4000);
+                showToast('{{ session('success') }}', 'success', '{{ session('success_title') }}', 4000);
             });
         </script>
     @endif
