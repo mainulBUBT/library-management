@@ -44,12 +44,57 @@ class SettingController extends Controller
             'library_name' => 'nullable|string|max:255',
             'library_email' => 'nullable|email|max:255',
             'library_phone' => 'nullable|string|max:20',
+
+            // Payment accounts
+            'accounts' => 'nullable|array',
+            'accounts.*.type' => 'required|in:mobile_banking,bank_account',
+            'accounts.*.provider' => 'nullable|string|max:255',
+            'accounts.*.mobile_number' => 'nullable|string|max:20',
+            'accounts.*.bank_name' => 'nullable|string|max:255',
+            'accounts.*.account_number' => 'nullable|string|max:255',
+            'accounts.*.account_name' => 'nullable|string|max:255',
+            'accounts.*.branch_name' => 'nullable|string|max:255',
         ]);
 
-        // Update settings
+        // Update regular settings
         foreach ($validated as $key => $value) {
-            if ($value !== null) {
+            if ($value !== null && $key !== 'accounts') {
                 Setting::set($key, $value);
+            }
+        }
+
+        // Delete old payment accounts
+        Setting::where('key', 'like', 'payment_account_%')->delete();
+
+        // Save payment accounts
+        if (!empty($validated['accounts'])) {
+            foreach ($validated['accounts'] as $index => $account) {
+                $accountIndex = $index + 1;
+                
+                // Save account type
+                Setting::set("payment_account_{$accountIndex}_type", $account['type']);
+                
+                if ($account['type'] === 'mobile_banking') {
+                    if (!empty($account['provider'])) {
+                        Setting::set("payment_account_{$accountIndex}_provider", $account['provider']);
+                    }
+                    if (!empty($account['mobile_number'])) {
+                        Setting::set("payment_account_{$accountIndex}_mobile_number", $account['mobile_number']);
+                    }
+                } elseif ($account['type'] === 'bank_account') {
+                    if (!empty($account['bank_name'])) {
+                        Setting::set("payment_account_{$accountIndex}_bank_name", $account['bank_name']);
+                    }
+                    if (!empty($account['account_number'])) {
+                        Setting::set("payment_account_{$accountIndex}_account_number", $account['account_number']);
+                    }
+                    if (!empty($account['account_name'])) {
+                        Setting::set("payment_account_{$accountIndex}_account_name", $account['account_name']);
+                    }
+                    if (!empty($account['branch_name'])) {
+                        Setting::set("payment_account_{$accountIndex}_branch_name", $account['branch_name']);
+                    }
+                }
             }
         }
 

@@ -61,13 +61,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Logout modal
     const openLogoutModal = () => {
         if (!logoutModal) return;
-        logoutModal.classList.add('open');
+        logoutModal.classList.add('show');
         document.body.classList.add('overflow-hidden');
     };
 
     const closeLogoutModal = () => {
         if (!logoutModal) return;
-        logoutModal.classList.remove('open');
+        logoutModal.classList.remove('show');
         document.body.classList.remove('overflow-hidden');
     };
 

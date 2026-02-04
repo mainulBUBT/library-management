@@ -7,22 +7,14 @@
     };
 @endphp
 
-<div class="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-    <div>
-        <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
-        <p class="text-gray-500 mt-1">Configure your library system</p>
-    </div>
-    <button type="submit" form="settings-form" class="btn-primary">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-        Save Changes
-    </button>
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
+    <p class="text-gray-500 mt-1">Configure your library system</p>
 </div>
 
 @if($settings->isEmpty())
-    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4 mb-6">
-        <div class="flex items-center justify-between gap-4">
+    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-6 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h2 class="font-semibold text-indigo-900">Initialize default settings</h2>
                 <p class="text-sm text-indigo-700 mt-1">Load recommended defaults for loan rules and fines.</p>
@@ -119,7 +111,7 @@
                                 <p class="text-xs text-gray-500 mt-1">How long members can keep borrowed items</p>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
                                 <label class="form-label">Student</label>
                                 <input type="number" min="1" max="365" name="loan_period_student" class="form-input"
@@ -163,7 +155,7 @@
                                 <p class="text-xs text-gray-500 mt-1">Items that can be borrowed simultaneously</p>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
                                 <label class="form-label">Student</label>
                                 <input type="number" min="1" max="20" name="max_loans_student" class="form-input"
@@ -233,7 +225,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="form-label">Fine Per Day ($)</label>
+                        <label class="form-label">Fine Per Day</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-500 sm:text-sm">$</span>
@@ -274,92 +266,52 @@
         <div id="payment-methods-tab" class="tab-content">
             <div class="card-body">
                 <div class="mb-6">
-                    <h3 class="text-base font-semibold text-gray-900">Payment Configuration</h3>
-                    <p class="text-sm text-gray-500 mt-1">Manage how your library accepts fine payments</p>
+                    <h3 class="text-base font-semibold text-gray-900">Payment Accounts</h3>
+                    <p class="text-sm text-gray-500 mt-1">Manage payment accounts for receiving library fines</p>
                 </div>
 
-                <div class="text-center py-12">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                <!-- Information Box - Moved to Top -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
+                        <div>
+                            <h5 class="text-sm font-semibold text-blue-900">Dynamic Payment Accounts</h5>
+                            <p class="text-sm text-blue-700 mt-1">
+                                Add multiple payment accounts for different methods. Select the account type from the dropdown, 
+                                then fill in the required details. Click "Save Changes" at the bottom to save all accounts.
+                            </p>
+                        </div>
                     </div>
-                    <h4 class="text-base font-semibold text-gray-900 mb-2">Offline Payment Tracking</h4>
-                    <p class="text-sm text-gray-600 max-w-lg mx-auto mb-6">
-                        Currently, the system tracks offline payments (cash, check, bank transfer) made at the library desk. 
-                        Payment gateway integration for online payments is planned for future releases.
-                    </p>
-                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                        Coming in Future Updates
-                    </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 pt-6 border-t border-gray-200">
-                    <div>
-                        <h5 class="text-sm font-semibold text-gray-900 mb-3">Currently Supported</h5>
-                        <ul class="text-sm text-gray-600 space-y-2">
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                Cash payments
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                Check payments
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                Bank transfers
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                Payment receipts
-                            </li>
-                        </ul>
+                <div class="space-y-6" id="payment-accounts-container">
+                    <!-- Dynamic Accounts Container -->
+                    <div id="accounts-list">
+                        <!-- Accounts will be dynamically added here -->
                     </div>
 
-                    <div>
-                        <h5 class="text-sm font-semibold text-gray-900 mb-3">Planned Features</h5>
-                        <ul class="text-sm text-gray-600 space-y-2">
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Stripe integration
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                PayPal support
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Online payment portal
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                Automated receipts
-                            </li>
-                        </ul>
+                    <!-- Add Account Button -->
+                    <div class="flex justify-center">
+                        <button type="button" id="add-account-btn" class="btn-primary inline-flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add Payment Account
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="border-t border-gray-200 px-6 py-4 flex items-center justify-end gap-3 bg-gray-50">
-            <button type="submit" class="btn-primary">Save All Settings</button>
+            <button type="submit" form="settings-form" class="btn-primary inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Save Changes
+            </button>
         </div>
     </form>
 </div>
@@ -409,6 +361,174 @@ document.addEventListener('DOMContentLoaded', function() {
                 tabButton.click();
             }
         }
+    }
+
+    // Dynamic Payment Accounts Functionality
+    let accountCounter = 0;
+    
+    // Add account button
+    document.getElementById('add-account-btn').addEventListener('click', function() {
+        addNewAccount();
+    });
+    
+    // Function to add new account form
+    function addNewAccount(accountData = null) {
+        accountCounter++;
+        const accountId = `account-${accountCounter}`;
+        
+        const accountHtml = `
+            <div class="card mb-6" id="${accountId}">
+                <div class="card-header">
+                    <h4 class="card-title">Payment Account #${accountCounter}</h4>
+                    <button type="button" class="text-red-500 hover:text-red-700 remove-account-btn" data-account-id="${accountId}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <label class="form-label">Account Type</label>
+                        <select name="accounts[${accountCounter}][type]" class="form-select account-type-select" data-account-id="${accountId}" required>
+                            <option value="">Select Account Type</option>
+                            <option value="mobile_banking" ${accountData && accountData.type === 'mobile_banking' ? 'selected' : ''}>Mobile Banking</option>
+                            <option value="bank_account" ${accountData && accountData.type === 'bank_account' ? 'selected' : ''}>Bank Account</option>
+                        </select>
+                    </div>
+                    
+                    <div class="account-details" id="details-${accountId}">
+                        ${getAccountDetailsHtml(accountData?.type || '', accountData, accountCounter)}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('accounts-list').insertAdjacentHTML('beforeend', accountHtml);
+        
+        // Add event listener for type selection
+        const selectElement = document.querySelector(`select.account-type-select[data-account-id="${accountId}"]`);
+        selectElement.addEventListener('change', function() {
+            const selectedType = this.value;
+            const detailsContainer = document.getElementById(`details-${accountId}`);
+            detailsContainer.innerHTML = getAccountDetailsHtml(selectedType, null, accountCounter);
+        });
+        
+        // Add event listener for remove button
+        document.getElementById(accountId).querySelector('.remove-account-btn').addEventListener('click', function() {
+            document.getElementById(accountId).remove();
+            updateAccountNumbers();
+        });
+    }
+    
+    // Function to get account details HTML based on type
+    function getAccountDetailsHtml(type, accountData, counter) {
+        if (type === 'mobile_banking') {
+            return `
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">Provider Name</label>
+                        <input type="text" name="accounts[${counter}][provider]" class="form-input" 
+                               value="${accountData?.provider || ''}" 
+                               placeholder="e.g., bKash, Nagad, Rocket">
+                        <p class="text-xs text-gray-500 mt-1">Enter the mobile banking provider name</p>
+                    </div>
+                    <div>
+                        <label class="form-label">Mobile Number</label>
+                        <input type="text" name="accounts[${counter}][mobile_number]" class="form-input" 
+                               value="${accountData?.mobile_number || ''}" 
+                               placeholder="e.g., 01XXXXXXXXX" required>
+                        <p class="text-xs text-gray-500 mt-1">Members will send payments to this number</p>
+                    </div>
+                </div>
+            `;
+        } else if (type === 'bank_account') {
+            return `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" name="accounts[${counter}][bank_name]" class="form-input" 
+                                   value="${accountData?.bank_name || ''}" 
+                                   placeholder="e.g., Dutch-Bangla Bank" required>
+                        </div>
+                        <div>
+                            <label class="form-label">Account Number</label>
+                            <input type="text" name="accounts[${counter}][account_number]" class="form-input" 
+                                   value="${accountData?.account_number || ''}" 
+                                   placeholder="e.g., 1234567890" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Account Holder Name</label>
+                            <input type="text" name="accounts[${counter}][account_name]" class="form-input" 
+                                   value="${accountData?.account_name || ''}" 
+                                   placeholder="e.g., Library Management System" required>
+                        </div>
+                        <div>
+                            <label class="form-label">Branch Name (Optional)</label>
+                            <input type="text" name="accounts[${counter}][branch_name]" class="form-input" 
+                                   value="${accountData?.branch_name || ''}" 
+                                   placeholder="e.g., Gulshan Branch">
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p class="text-sm text-blue-700">
+                            <strong>Note:</strong> Members can use these details to deposit or transfer money to your library account.
+                        </p>
+                    </div>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                    <p class="text-gray-600 font-medium">Select an account type above</p>
+                    <p class="text-sm text-gray-500 mt-1">Choose Mobile Banking or Bank Account to continue</p>
+                </div>
+            `;
+        }
+    }
+    
+    // Function to update account numbers after removal
+    function updateAccountNumbers() {
+        const accounts = document.querySelectorAll('#accounts-list .card');
+        accounts.forEach((account, index) => {
+            const title = account.querySelector('.card-title');
+            title.textContent = `Payment Account #${index + 1}`;
+        });
+    }
+    
+    // Load existing accounts if any (this would come from backend)
+    // For demo purposes, adding one empty account
+    const existingAccounts = @json($settings->filter(function($setting) {
+        return str_starts_with($setting->key, 'payment_account_');
+    })->values());
+    
+    if (existingAccounts.length > 0) {
+        // Group accounts by their index
+        const accountsMap = {};
+        existingAccounts.forEach(setting => {
+            const match = setting.key.match(/payment_account_(\d+)_(.+)/);
+            if (match) {
+                const index = match[1];
+                const field = match[2];
+                if (!accountsMap[index]) {
+                    accountsMap[index] = {};
+                }
+                accountsMap[index][field] = setting.value;
+            }
+        });
+        
+        // Add each account
+        Object.values(accountsMap).forEach(accountData => {
+            addNewAccount(accountData);
+        });
+    } else {
+        // Add one empty account if none exist
+        addNewAccount();
     }
 });
 </script>

@@ -45,7 +45,7 @@ class Setting extends Model
     /**
      * Set a setting value.
      */
-    public static function set(string $key, mixed $value, string $type = 'string'): void
+    public static function set(string $key, mixed $value, string $type = 'string', ?string $displayName = null, ?string $description = null, ?string $group = null): void
     {
         $displayValue = match ($type) {
             'boolean' => $value ? '1' : '0',
@@ -53,9 +53,25 @@ class Setting extends Model
             default => (string) $value,
         };
 
+        $data = [
+            'value' => $displayValue,
+            'type' => $type,
+        ];
+
+        // Add optional fields if provided, otherwise use key as display name
+        $data['display_name'] = $displayName ?? str_replace('_', ' ', ucwords($key, '_'));
+        
+        if ($description !== null) {
+            $data['description'] = $description;
+        }
+        
+        if ($group !== null) {
+            $data['group'] = $group;
+        }
+
         static::updateOrCreate(
             ['key' => $key],
-            ['value' => $displayValue, 'type' => $type]
+            $data
         );
     }
 
