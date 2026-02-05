@@ -108,11 +108,27 @@ A modern, future-proof library management system suitable for schools, social cl
 - Maximum renewals allowed
 - Grace periods
 
-### 4. Fine & Payment Management
+### 4. Fines & Payments Management
 
-**Offline Payment System**:
+**Offline Payment Tracking (No Gateway)**:
 
 This system tracks cash, check, and other offline payments made by members for library fines and fees.
+
+**Supported Payment Methods**:
+- **Cash** - Physical currency payments
+- **Check** - Bank checks with check number tracking
+- **Bank Transfer** - Manual bank transfer recording
+- **Mobile Banking** - Bangladesh-based systems:
+  - bKash
+  - Nagad
+  - Rocket
+  - Upay
+  - SureCash
+  - MyCash
+  - Tap/Nagad
+  - Dutch-Bangla Mobile Banking
+- **Credit/Debit Card** - Manual card payment recording
+- **Other** - Custom payment methods
 
 **Features**:
 - **Automated fine calculation**
@@ -120,30 +136,91 @@ This system tracks cash, check, and other offline payments made by members for l
   - Damage fees (flat rate or custom amount)
   - Lost item fees (replacement cost + processing fee)
 - **Payment recording**
-  - Payment method (Cash, Check, Money Order, Bank Transfer)
-  - Check number (if applicable)
+  - Payment method selection from supported options
+  - Method-specific details capture:
+    - Check: Check number, bank name
+    - Bank Transfer: Reference number, bank name
+    - Mobile Banking: Transaction ID, mobile number
+    - Card Payment: Last 4 digits, card type
   - Payment date and time
   - Received by (staff member)
   - Notes/remarks
 - **Payment history & tracking**
   - All payments linked to member account
-  - Transaction log with audit trail
+  - Detailed transaction log with audit trail
   - Outstanding balance tracking
+  - Payment method statistics
 - **Fine management**
   - Fine waiver/adjustment (with reason & approval)
   - Partial payments allowed
   - Multiple payments per fine
   - Fine status: Pending, Partially Paid, Paid, Waived
+  - Refunds/reversals (with reason & approval)
 - **Receipt generation**
   - Auto-generated PDF receipts
   - Customizable receipt templates
   - Receipt numbering system
   - Email receipt option
+  - Payment method details included on receipts
 - **Reports**
   - Daily cash collection report
   - Outstanding fines report
   - Payment history by member
   - Revenue summary (by date range)
+  - Payment method usage statistics
+  - Monthly/annual financial summaries
+
+### 5. Reports & Analytics
+
+**Comprehensive Reporting System**:
+
+**Financial Reports**:
+- Daily/Weekly/Monthly revenue reports
+- Payment method usage analysis
+- Outstanding fines summary
+- Member payment history
+- Staff performance metrics
+
+**Operational Reports**:
+- Most borrowed resources
+- Overdue items tracking
+- Member activity trends
+- Resource utilization statistics
+- Staff workload distribution
+
+**Custom Reports**:
+- Filter by date ranges
+- Export to PDF/Excel/CSV
+- Scheduled report generation
+- Report sharing capabilities
+
+### 6. Settings & Configuration
+
+**System Settings**:
+
+**Features**:
+- **Library profile**
+  - Organization name, logo, address, contact info
+  - Operating hours and holiday calendar
+- **Circulation rules**
+  - Borrowing limits per role
+  - Loan periods per resource type
+  - Renewal limits and grace periods
+- **Fines & fees configuration**
+  - Late fee rate per day
+  - Damage/lost fee defaults
+  - Receipt numbering prefix and format
+- **Payment method management**
+  - Enable/disable payment methods
+  - Configure method-specific fields
+  - Set up mobile banking providers
+  - Customize payment workflows
+- **Notifications**
+  - Email/SMS toggles (if enabled)
+  - Template customization for due/overdue notices
+- **Data & audit**
+  - Export and backup options
+  - Activity log retention settings
 
 ---
 
@@ -173,7 +250,7 @@ Refer to [DASH_UI_GUIDE.md](DASH_UI_GUIDE.md) and [ADVANCED_FEATURES.md](ADVANCE
    - Setup Dash UI with TailwindCSS
    - Create database structure
 3. **Build Core Modules** - Implement features incrementally
-   - Catalog management
+   ### 8. Catalog Management
    - Circulation system
    - Member management
 4. **Frontend Development** - Build Next.js user portal
