@@ -1,9 +1,20 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/stores/authStore'
+import {
+  Home,
+  BookOpen,
+  Bookmark,
+  DollarSign,
+  User,
+  LogOut,
+  Menu,
+  X,
+  Search
+} from 'lucide-react'
 
 export default function DashboardLayout({
   children,
@@ -11,7 +22,9 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { isAuthenticated, user, logout, loadFromStorage } = useAuthStore()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     loadFromStorage()
@@ -20,121 +33,165 @@ export default function DashboardLayout({
     }
   }, [isAuthenticated, router, loadFromStorage])
 
+  const handleLogout = () => {
+    logout()
+    router.push('/')
+  }
+
+  const navItems = [
+    { name: 'Overview', href: '/dashboard', icon: Home },
+    { name: 'My Loans', href: '/dashboard/loans', icon: BookOpen },
+    { name: 'Reservations', href: '/dashboard/reservations', icon: Bookmark },
+    { name: 'Fines & Payments', href: '/dashboard/fines', icon: DollarSign },
+    { name: 'Profile', href: '/dashboard/profile', icon: User },
+  ]
+
   if (!isAuthenticated) {
     return null
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--color-background)] flex flex-col">
       {/* Top Navbar */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <header className="library-header sticky top-0 z-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex h-20 items-center justify-between relative">
             {/* Logo */}
-            <div className="flex items-center gap-3">
-              <Link href="/dashboard" className="flex items-center gap-3">
-                <svg className="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253m0-13C6.832 5.477 5.754 18 4.5 1.253v13" />
-                </svg>
-                <span className="text-xl font-bold text-gray-900">Library</span>
-              </Link>
-            </div>
+            <Link href="/dashboard" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[var(--library-accent)] rounded-lg flex items-center justify-center shadow-lg">
+                <BookOpen className="w-6 h-6 text-[var(--library-primary-dark)]" />
+              </div>
+              <div className="hidden sm:block">
+                <h1 className="text-lg font-bold text-white leading-tight">City Library</h1>
+                <p className="text-xs text-[var(--library-accent)]">Member Dashboard</p>
+              </div>
+            </Link>
 
             {/* Right Nav Items */}
             <div className="flex items-center gap-4">
-              <Link href="/catalog" className="text-gray-600 hover:text-indigo-600 font-medium text-sm">
+              <Link
+                href="/catalog"
+                className="hidden sm:flex items-center gap-2 px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all font-medium"
+              >
+                <Search className="w-4 h-4" />
                 Browse Catalog
               </Link>
+
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <span className="text-indigo-600 font-semibold text-sm">
+                <div className="w-10 h-10 rounded-full bg-[var(--library-accent)] flex items-center justify-center shadow-md">
+                  <span className="text-[var(--library-primary-dark)] font-bold">
                     {user?.name?.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <span className="text-sm font-medium text-gray-700 hidden sm:block">{user?.name}</span>
+                <div className="hidden md:block">
+                  <p className="text-sm font-semibold text-white">{user?.name}</p>
+                  <p className="text-xs text-white/60">Member</p>
+                </div>
                 <button
-                  onClick={logout}
-                  className="text-gray-500 hover:text-red-600 transition-colors"
+                  onClick={handleLogout}
+                  className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors hidden sm:block"
+                  title="Sign out"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
+                  <LogOut className="w-5 h-5" />
                 </button>
               </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Navigation */}
-          <aside className="lg:w-64 flex-shrink-0">
-            <nav className="bg-white rounded-lg shadow-sm p-4 sticky top-24">
-              <ul className="space-y-1">
-                <li>
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    Overview
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/dashboard/loans"
-                    className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253m0-13C6.832 5.477 5.754 18 4.5 1.253v13" />
-                    </svg>
-                    My Loans
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/dashboard/reservations"
-                    className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                    </svg>
-                    Reservations
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/dashboard/fines"
-                    className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Fines
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/dashboard/profile"
-                    className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    Profile
-                  </Link>
-                </li>
-              </ul>
-            </nav>
-          </aside>
+      {/* Mobile Navigation */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-white border-b border-[var(--library-border)]">
+          <nav className="px-4 py-4 space-y-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${
+                    isActive
+                      ? 'bg-[var(--library-primary)] text-white'
+                      : 'text-[var(--library-text-muted)] hover:bg-[var(--library-cream)] hover:text-[var(--library-primary)]'
+                  }`}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.name}
+                </Link>
+              )
+            })}
+            <button
+              onClick={() => {
+                handleLogout()
+                setMobileMenuOpen(false)
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              Sign Out
+            </button>
+          </nav>
+        </div>
+      )}
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0">
-            {children}
-          </main>
+      {/* Main Content Area */}
+      <div className="flex-1">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sidebar Navigation */}
+            <aside className="hidden lg:block lg:w-64 flex-shrink-0">
+              <nav className="card sticky top-24">
+                <div className="mb-4 pb-4 border-b border-[var(--library-border)]">
+                  <p className="text-xs font-semibold text-[var(--library-text-muted)] uppercase tracking-wider">
+                    Menu
+                  </p>
+                </div>
+                <ul className="space-y-1">
+                  {navItems.map((item) => {
+                    const isActive = pathname === item.href
+                    return (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          className={`sidebar-link ${isActive ? 'active' : ''}`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {item.name}
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+
+                {/* Logout Button */}
+                <div className="mt-6 pt-4 border-t border-[var(--library-border)]">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-600 hover:bg-red-50 font-medium transition-colors"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Sign Out
+                  </button>
+                </div>
+              </nav>
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 min-w-0">
+              {children}
+            </main>
+          </div>
         </div>
       </div>
     </div>

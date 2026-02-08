@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
+import { BookOpen, Mail, Lock, AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -36,110 +37,126 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md">
-        {/* Card */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-6 sm:p-8">
-            {/* Logo & Header */}
-            <div className="mb-6">
-              <div className="flex items-center justify-center mb-4">
-                <svg className="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253m0-13C6.832 5.477 5.754 18 4.5 1.253v13" />
-                </svg>
-              </div>
-              <h1 className="text-2xl font-bold text-gray-800 text-center">Library Management</h1>
-              <p className="text-gray-500 text-sm text-center mt-2">Please enter your user information.</p>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Left Side - Decorative */}
+      <div className="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }} />
+        </div>
+        <div className="relative z-10 flex flex-col justify-center items-center h-full px-12 text-center">
+          <div className="w-20 h-20 bg-white/10 backdrop-blur rounded-2xl flex items-center justify-center mb-8 border border-white/10">
+            <BookOpen className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-3xl font-semibold text-white mb-4">Welcome Back</h1>
+          <p className="text-lg text-slate-400 max-w-md">
+            Access your personal dashboard, manage loans, and explore our collection of resources.
+          </p>
+        </div>
+      </div>
+
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex items-center justify-center mb-8">
+            <div className="w-14 h-14 bg-slate-900 rounded-xl flex items-center justify-center">
+              <BookOpen className="w-8 h-8 text-white" />
+            </div>
+          </div>
+
+          {/* Form Card */}
+          <div className="card">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-gray-900">Sign In to Your Account</h1>
+              <p className="text-gray-600 mt-2">Enter your credentials to access the library</p>
             </div>
 
             {/* Error Alert */}
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
-                {error}
+              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
 
-            {/* Form */}
             <form onSubmit={handleSubmit}>
               {/* Email */}
-              <div className="mb-3">
-                <label htmlFor="email" className="inline-block mb-2 text-sm font-medium text-gray-700">
-                  Username or email
+              <div className="mb-5">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-2">
+                  Email Address
                 </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none"
-                  placeholder="Email address here"
-                  required
-                />
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    id="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="input-field pl-12"
+                    placeholder="your@email.com"
+                    required
+                  />
+                </div>
               </div>
 
               {/* Password */}
-              <div className="mb-5">
-                <label htmlFor="password" className="inline-block mb-2 text-sm font-medium text-gray-700">
+              <div className="mb-6">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-900 mb-2">
                   Password
                 </label>
-                <input
-                  type="password"
-                  id="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none"
-                  placeholder="**************"
-                  required
-                />
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    id="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="input-field pl-12"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
               </div>
 
-              {/* Remember Me */}
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    className="w-4 h-4 text-indigo-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-indigo-600"
-                  />
-                  <label htmlFor="remember" className="inline-block ml-2 text-sm text-gray-600">
-                    Remember me
-                  </label>
-                </div>
+              {/* Remember & Forgot */}
+              <div className="flex items-center justify-between mb-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" className="w-4 h-4 accent-slate-900" />
+                  <span className="text-sm text-slate-600">Remember me</span>
+                </label>
+                <a href="#" className="text-sm text-slate-600 hover:text-slate-900 font-medium">
+                  Forgot password?
+                </a>
               </div>
 
               {/* Submit Button */}
-              <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-indigo-600 text-white border border-indigo-600 hover:bg-indigo-700 hover:border-indigo-700 active:bg-indigo-800 active:border-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-300 rounded-md font-semibold py-2 px-4 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Signing in...' : 'Sign in'}
-                </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full btn-primary text-base py-3"
+              >
+                {loading ? 'Signing in...' : 'Sign In'}
+              </button>
 
-                <div className="flex justify-between mt-4">
-                  <div>
-                    <Link href="/register" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
-                      Create An Account
-                    </Link>
-                  </div>
-                  <div>
-                    <a href="#" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
-                      Forgot your password?
-                    </a>
-                  </div>
-                </div>
-              </div>
+              {/* Register Link */}
+              <p className="text-center mt-6 text-slate-600">
+                Don't have an account?{' '}
+                <Link href="/register" className="text-slate-900 hover:text-slate-700 font-semibold">
+                  Create one now
+                </Link>
+              </p>
             </form>
           </div>
-        </div>
 
-        {/* Admin Login Link */}
-        <p className="text-gray-400 text-xs mt-4 text-center">
-          <Link href="/admin/login" className="text-gray-400 hover:text-gray-600">
-            Admin Login
-          </Link>
-        </p>
+          {/* Admin Login Link */}
+          <p className="text-center mt-6 text-gray-500 text-sm">
+            <Link href="/admin/login" className="hover:text-gray-900">
+              Admin Login →
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

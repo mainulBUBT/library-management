@@ -1,101 +1,288 @@
-import Link from "next/link";
+'use client'
+
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import LibraryHeader from '@/components/layout/LibraryHeader'
+import LibraryFooter from '@/components/layout/LibraryFooter'
+import BookGrid from '@/components/catalog/BookGrid'
+import {
+  BookOpen,
+  Search,
+  Home as HomeIcon,
+  Compass,
+  LayoutDashboard,
+  LogIn,
+  UserPlus,
+  SlidersHorizontal,
+  X,
+  Menu,
+} from 'lucide-react'
+import api from '@/lib/api'
 
 export default function Home() {
+  const pathname = usePathname()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedType, setSelectedType] = useState('')
+  const [showFilters, setShowFilters] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Fetch categories
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const response = await api.get('/categories')
+      return response.data
+    },
+  })
+
+  // Fetch resources
+  const { data: resourcesData, isLoading } = useQuery({
+    queryKey: ['catalog', searchTerm, selectedCategory, selectedType],
+    queryFn: async () => {
+      const params = new URLSearchParams()
+      if (searchTerm) params.append('search', searchTerm)
+      if (selectedCategory) params.append('category_id', selectedCategory)
+      if (selectedType) params.append('type', selectedType)
+
+      const response = await api.get(`/catalog?${params.toString()}`)
+      return response.data
+    },
+  })
+
+  const categories = categoriesData?.categories || []
+  const resources = resourcesData?.data || []
+
+  const resourceTypes = [
+    { value: 'book', label: 'Books', icon: BookOpen },
+    { value: 'journal', label: 'Journals', icon: BookOpen },
+    { value: 'magazine', label: 'Magazines', icon: BookOpen },
+    { value: 'newspaper', label: 'Newspapers', icon: BookOpen },
+    { value: 'digital_media', label: 'Digital Media', icon: BookOpen },
+  ]
+
+  const hasActiveFilters = searchTerm || selectedCategory || selectedType
+
+  const clearFilters = () => {
+    setSearchTerm('')
+    setSelectedCategory('')
+    setSelectedType('')
+  }
+
+  const navLinks = [
+    { href: '/', label: 'Home', icon: HomeIcon, active: pathname === '/' },
+    { href: '/catalog', label: 'Catalog', icon: Compass, active: pathname === '/catalog' },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, active: pathname === '/dashboard' },
+    { href: '/login', label: 'Sign In', icon: LogIn, active: pathname === '/login' },
+    { href: '/register', label: 'Register', icon: UserPlus, active: pathname === '/register' },
+  ]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-3">
-              <svg className="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253m0-13C6.832 5.477 5.754 18 4.5 1.253v13" />
-              </svg>
-              <span className="text-xl font-bold text-gray-900">Library Management</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-indigo-600">
-                Sign In
-              </Link>
-              <Link href="/register" className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
+      <LibraryHeader />
 
-      {/* Hero Section */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="py-20 sm:py-32">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-              Your Digital Library
-              <span className="block text-indigo-600">At Your Fingertips</span>
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
-              Browse our extensive catalog, manage your loans, make reservations, and track your reading history
-              all in one place.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-6">
-              <Link href="/catalog" className="rounded-md bg-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-indigo-500">
-                Browse Catalog
-              </Link>
-              <Link href="/register" className="rounded-md border border-gray-300 bg-white px-6 py-3 text-base font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
-                Create Account
-              </Link>
-            </div>
-          </div>
+      {/* Main Layout */}
+      <main className="flex-1">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sidebar */}
+            <aside className="lg:w-64 flex-shrink-0">
+              {/* Mobile Menu Toggle */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden w-full flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-lg border border-gray-200 text-gray-900 font-medium mb-4"
+              >
+                <Menu className="w-5 h-5" />
+                {mobileMenuOpen ? 'Hide Menu' : 'Show Menu'}
+              </button>
 
-          {/* Features */}
-          <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100">
-                <svg className="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+              {/* Sidebar Content */}
+              <div className={`${mobileMenuOpen ? 'block' : 'hidden'} lg:block space-y-4`}>
+                {/* Navigation */}
+                <div className="card">
+                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Menu className="w-4 h-4" />
+                    Navigation
+                  </h3>
+                  <nav className="space-y-1">
+                    {navLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                          link.active
+                            ? 'bg-blue-50 text-blue-600 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
+                      >
+                        <link.icon className="w-5 h-5" />
+                        {link.label}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+
+                {/* Filters */}
+                <div className="card sticky top-24">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                      <SlidersHorizontal className="w-4 h-4" />
+                      Filters
+                    </h3>
+                    {hasActiveFilters && (
+                      <button
+                        onClick={clearFilters}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                      >
+                        <X className="w-3 h-3" />
+                        Clear all
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Resource Type Filter */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-gray-900 mb-3">
+                      Resource Type
+                    </label>
+                    <div className="space-y-2">
+                      {resourceTypes.map((type) => (
+                        <label key={type.value} className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="radio"
+                            name="resourceType"
+                            value={type.value}
+                            checked={selectedType === type.value}
+                            onChange={(e) => setSelectedType(e.target.value)}
+                            className="w-4 h-4 accent-blue-600"
+                          />
+                          <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                            {type.label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Category Filter */}
+                  {categories.length > 0 && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-semibold text-gray-900 mb-3">
+                        Category
+                      </label>
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="input-field"
+                      >
+                        <option value="">All Categories</option>
+                        {categories.map((cat: any) => (
+                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Active Filters Display */}
+                  {hasActiveFilters && (
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                        Active Filters
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {searchTerm && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md">
+                            Search: "{searchTerm.slice(0, 15)}{searchTerm.length > 15 ? '...' : ''}"
+                            <button onClick={() => setSearchTerm('')} className="hover:text-blue-900">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        )}
+                        {selectedType && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md">
+                            {resourceTypes.find(t => t.value === selectedType)?.label}
+                            <button onClick={() => setSelectedType('')} className="hover:text-blue-900">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        )}
+                        {selectedCategory && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md">
+                            {categories.find((c: any) => c.id === selectedCategory)?.name}
+                            <button onClick={() => setSelectedCategory('')} className="hover:text-blue-900">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Search Catalog</h3>
-              <p className="mt-2 text-sm text-gray-600">
-                Search through thousands of books, journals, and digital resources by title, author, or category.
-              </p>
-            </div>
+            </aside>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
-                <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253m0-13C6.832 5.477 5.754 18 4.5 1.253v13" />
-                </svg>
+            {/* Main Content */}
+            <div className="flex-1 min-w-0">
+              {/* Welcome Hero */}
+              <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 sm:p-8 mb-8 text-white">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+                      Welcome to the Library
+                    </h1>
+                    <p className="text-slate-300 max-w-xl">
+                      Browse our collection of books, journals, and digital resources. Use the filters to find exactly what you're looking for.
+                    </p>
+                  </div>
+                  <div className="hidden sm:block">
+                    <BookOpen className="w-16 h-16 text-white/10" />
+                  </div>
+                </div>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Manage Loans</h3>
-              <p className="mt-2 text-sm text-gray-600">
-                View your borrowed items, renew books online, and track due dates from your personal dashboard.
-              </p>
-            </div>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
-                <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                </svg>
+              {/* Search Bar */}
+              <div className="search-input-wrapper max-w-2xl mb-6">
+                <Search className="w-5 h-5" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by title, author, ISBN..."
+                  className="input-field pl-12"
+                />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">Reserve Items</h3>
-              <p className="mt-2 text-sm text-gray-600">
-                Place holds on popular titles and get notified when they become available for checkout.
-              </p>
+
+              {/* Results Info */}
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {isLoading ? 'Loading...' : hasActiveFilters ? 'Search Results' : 'All Resources'}
+                  </h2>
+                  <p className="text-gray-600 mt-1">
+                    {isLoading ? 'Please wait...' : `${resources.length} items found`}
+                  </p>
+                </div>
+
+                {/* Mobile Filter Toggle (below search) */}
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-blue-600 font-medium"
+                >
+                  <SlidersHorizontal className="w-5 h-5" />
+                  Filters
+                </button>
+              </div>
+
+              {/* Book Grid */}
+              <BookGrid resources={resources} isLoading={isLoading} />
             </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-gray-500">
-            © 2026 Library Management System. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <LibraryFooter />
     </div>
-  );
+  )
 }
