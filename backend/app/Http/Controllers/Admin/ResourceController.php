@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Publisher;
 use App\Models\Resource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -75,7 +76,17 @@ class ResourceController extends Controller
             'authors' => 'nullable|array',
             'authors.*' => 'exists:authors,id',
             'copies_count' => 'required|integer|min:1|max:100',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        // Handle file upload
+        $coverImagePath = null;
+        if ($request->hasFile('cover_image')) {
+            $image = $request->file('cover_image');
+            $imageName = time() . '_' . Str::slug($validated['title']) . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('public/covers', $imageName);
+            $coverImagePath = 'covers/' . $imageName;
+        }
 
         $resource = Resource::create([
             'title' => $validated['title'],
@@ -88,6 +99,7 @@ class ResourceController extends Controller
             'publication_year' => $validated['publication_year'] ?? null,
             'language' => $validated['language'] ?? 'en',
             'pages' => $validated['pages'] ?? null,
+            'cover_image' => $coverImagePath,
         ]);
 
         // Attach authors
@@ -154,7 +166,29 @@ class ResourceController extends Controller
             'status' => 'required|in:available,unavailable,archived',
             'authors' => 'nullable|array',
             'authors.*' => 'exists:authors,id',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'remove_cover_image' => 'nullable|boolean',
         ]);
+
+        // Handle image upload or removal
+        $coverImagePath = $resource->cover_image;
+        if ($request->hasFile('cover_image')) {
+            // Delete old image
+            if ($resource->cover_image && Storage::exists('public/' . $resource->cover_image)) {
+                Storage::delete('public/' . $resource->cover_image);
+            }
+            // Upload new image
+            $image = $request->file('cover_image');
+            $imageName = time() . '_' . Str::slug($validated['title']) . '.' . $image->getClientOriginalExtension();
+            $image->storeAs('public/covers', $imageName);
+            $coverImagePath = 'covers/' . $imageName;
+        } elseif (!empty($validated['remove_cover_image'])) {
+            // Remove image
+            if ($resource->cover_image && Storage::exists('public/' . $resource->cover_image)) {
+                Storage::delete('public/' . $resource->cover_image);
+            }
+            $coverImagePath = null;
+        }
 
         $resource->update([
             'title' => $validated['title'],
@@ -168,6 +202,7 @@ class ResourceController extends Controller
             'language' => $validated['language'] ?? 'en',
             'pages' => $validated['pages'] ?? null,
             'status' => $validated['status'],
+            'cover_image' => $coverImagePath,
         ]);
 
         // Sync authors

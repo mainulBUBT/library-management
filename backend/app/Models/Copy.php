@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Copy extends Model
 {
@@ -60,9 +61,9 @@ class Copy extends Model
     /**
      * Get the active loan for the copy.
      */
-    public function activeLoan(): HasMany
+    public function activeLoan(): HasOne
     {
-        return $this->hasMany(Loan::class)->where('status', 'active');
+        return $this->hasOne(Loan::class)->where('status', 'active');
     }
 
     /**
