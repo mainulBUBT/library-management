@@ -12,7 +12,6 @@
 </div>
 
 <div class="w-full">
-    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.categories.update', $category) }}" class="card">
         @csrf
         @method('PUT')
@@ -30,7 +29,7 @@
                 </div>
                 <div>
                     <label class="form-label">Parent Category</label>
-                    <select name="parent_id" class="form-select">
+                    <select name="parent_id" class="form-select select2">
                         <option value="">None (Top Level)</option>
                         @foreach($categories as $cat)
                             <option value="{{ $cat->id }}" {{ old('parent_id', $category->parent_id) == $cat->id ? 'selected' : '' }}>
@@ -66,6 +65,30 @@
             <button type="submit" class="btn-primary">Update Category</button>
         </div>
     </form>
-    </div>
 </div>
+
+@push('scripts')
+<style>
+.select2-container .select2-selection {
+    border-color: #d1d5db;
+    min-height: 38px;
+}
+.select2-container--default .select2-selection--single {
+    display: flex;
+    align-items: center;
+}
+.select2-dropdown {
+    border-color: #d1d5db;
+}
+</style>
+<script>
+// Initialize Select2
+document.addEventListener('DOMContentLoaded', function() {
+    $('select:not([multiple])').select2({
+        theme: 'default',
+        width: '100%'
+    });
+});
+</script>
+@endpush
 @endsection
