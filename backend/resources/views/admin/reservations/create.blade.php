@@ -12,7 +12,6 @@
 </div>
 
 <div class="w-full">
-    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.reservations.store') }}" class="card">
         @csrf
 
@@ -53,6 +52,5 @@
             <button type="submit" class="btn-primary">Create Reservation</button>
         </div>
     </form>
-    </div>
 </div>
 @endsection

@@ -12,7 +12,6 @@
 </div>
 
 <div class="w-full">
-    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.loans.store') }}" class="card">
         @csrf
 
@@ -80,7 +79,6 @@
                 <span class="font-medium">$0.50</span>
             </div>
         </div>
-    </div>
     </div>
 </div>
 @endsection

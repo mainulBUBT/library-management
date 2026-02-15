@@ -12,7 +12,6 @@
 </div>
 
 <div class="w-full">
-    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.members.store') }}" class="card">
         @csrf
 
@@ -49,7 +48,7 @@
                 </div>
                 <div>
                     <label class="form-label">Member Type <span class="text-red-500">*</span></label>
-                    <select name="member_type" class="form-select" required>
+                    <select name="member_type" class="form-select select2" required>
                         <option value="">Select type...</option>
                         <option value="student" {{ old('member_type') == 'student' ? 'selected' : '' }}>Student</option>
                         <option value="teacher" {{ old('member_type') == 'teacher' ? 'selected' : '' }}>Teacher</option>
@@ -66,7 +65,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                     <label class="form-label">Status <span class="text-red-500">*</span></label>
-                    <select name="status" class="form-select" required>
+                    <select name="status" class="form-select select2" required>
                         <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
                         <option value="suspended" {{ old('status') == 'suspended' ? 'selected' : '' }}>Suspended</option>
                         <option value="expired" {{ old('status') == 'expired' ? 'selected' : '' }}>Expired</option>
@@ -119,6 +118,29 @@
             <button type="submit" class="btn-primary">Create Member</button>
         </div>
     </form>
-    </div>
 </div>
+
+@push('scripts')
+<style>
+.select2-container .select2-selection {
+    border-color: #d1d5db;
+    min-height: 38px;
+}
+.select2-container--default .select2-selection--single {
+    display: flex;
+    align-items: center;
+}
+.select2-dropdown {
+    border-color: #d1d5db;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('select:not([multiple])').select2({
+        theme: 'default',
+        width: '100%'
+    });
+});
+</script>
+@endpush
 @endsection

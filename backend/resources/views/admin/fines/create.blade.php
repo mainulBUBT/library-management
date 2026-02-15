@@ -12,7 +12,6 @@
 </div>
 
 <div class="w-full">
-    <div class="mx-auto w-full max-w-4xl">
     <form method="POST" action="{{ route('admin.fines.store') }}" class="card">
         @csrf
 
@@ -63,6 +62,5 @@
             <button type="submit" class="btn-primary">Create Fine</button>
         </div>
     </form>
-    </div>
 </div>
 @endsection
