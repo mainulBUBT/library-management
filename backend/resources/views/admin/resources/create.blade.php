@@ -35,8 +35,8 @@
                     <label class="form-label">Cover Image</label>
 
                     <!-- Default Upload State -->
-                    <div id="upload-default-create" class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50/50">
-                        <div class="flex flex-col items-center">
+                    <div id="upload-create-container" class="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center transition-all duration-200 hover:border-indigo-400 hover:bg-indigo-50/50 relative">
+                        <div id="upload-default-create" class="flex flex-col items-center">
                             <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mb-2 shadow-md">
                                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -56,22 +56,21 @@
                                 Browse
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Preview State (Hidden by default) -->
-                    <div id="upload-preview-create" class="hidden">
-                        <div id="preview-container-create" class="relative rounded-lg overflow-hidden shadow-md border-2 border-transparent" style="width: 140px; height: 190px; transition: border-color 0.2s;">
-                            <img id="preview-img-create" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
-                            <!-- Delete button -->
-                            <button type="button" onclick="clearImage('create')"
-                                    class="absolute top-2 right-2 p-1.5 bg-white hover:bg-red-50 text-red-600 rounded-lg shadow-lg transition-all duration-200"
-                                    title="Remove image">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
+                        
+                        <!-- Preview State (Hidden by default) -->
+                        <div id="upload-preview-create" class="hidden text-center">
+                            <div class="relative inline-block group">
+                                <img id="preview-img-create" src="" alt="Preview" class="h-20 w-20 object-cover rounded-md shadow-sm border border-gray-200">
+                                <button type="button" onclick="clearImage('create')"
+                                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors z-10"
+                                        title="Remove image">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                             <p id="file-name-create" class="text-xs text-gray-500 mt-2 truncate w-full max-w-[10rem] mx-auto"></p>
                         </div>
-                        <p id="file-name-create" class="text-xs font-medium text-gray-800 truncate mt-2"></p>
                     </div>
 
                     @error('cover_image')
@@ -306,6 +305,7 @@ function handleFileSelect(input, type) {
     if (!validTypes.includes(file.type)) {
         alert('Please select a valid image file (JPEG, PNG, or GIF)');
         input.value = '';
+        if (type === 'create') clearImage(type);
         return;
     }
 
@@ -313,10 +313,11 @@ function handleFileSelect(input, type) {
     if (file.size > 2 * 1024 * 1024) {
         alert('File size must be less than 2MB');
         input.value = '';
+        if (type === 'create') clearImage(type);
         return;
     }
 
-    // Show preview
+// Show preview
     const reader = new FileReader();
     reader.onload = function(e) {
         if (type === 'create') {
@@ -324,9 +325,8 @@ function handleFileSelect(input, type) {
             fileNameCreate.textContent = file.name;
             uploadDefaultCreate.classList.add('hidden');
             uploadPreviewCreate.classList.remove('hidden');
-            // Add red border to indicate selected
-            document.getElementById('preview-container-create').classList.remove('border-transparent');
-            document.getElementById('preview-container-create').classList.add('border-red-500');
+            // Remove dashed border when preview is active
+            document.getElementById('upload-create-container').classList.remove('border-dashed');
         }
     };
     reader.readAsDataURL(file);
@@ -339,9 +339,8 @@ function clearImage(type) {
         fileNameCreate.textContent = '';
         uploadDefaultCreate.classList.remove('hidden');
         uploadPreviewCreate.classList.add('hidden');
-        // Remove red border
-        document.getElementById('preview-container-create').classList.remove('border-red-500');
-        document.getElementById('preview-container-create').classList.add('border-transparent');
+        // Add dashed border back
+        document.getElementById('upload-create-container').classList.add('border-dashed');
     }
 }
 </script>

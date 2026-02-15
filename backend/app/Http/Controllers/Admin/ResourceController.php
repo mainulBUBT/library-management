@@ -7,13 +7,14 @@ use App\Models\Author;
 use App\Models\Category;
 use App\Models\Publisher;
 use App\Models\Resource;
+use App\Traits\WithImageUpload;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ResourceController extends Controller
 {
+    use WithImageUpload;
     /**
      * Display a listing of the resource.
      */
@@ -64,29 +65,25 @@ class ResourceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|string',
             'isbn' => 'nullable|string|unique:resources,isbn',
             'resource_type' => 'required|in:book,journal,magazine,dvd,cd,research_paper,ebook,audiobook',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'publisher_id' => 'nullable|exists:publishers,id',
-            'publication_year' => 'nullable|integer|min:1000|max:' . (date('Y') + 1),
-            'language' => 'nullable|string|max:10',
+            'publication_year' => 'nullable|integer',
+            'language' => 'nullable|string',
             'pages' => 'nullable|integer|min:1',
             'authors' => 'nullable|array',
             'authors.*' => 'exists:authors,id',
-            'copies_count' => 'required|integer|min:1|max:100',
+            'copies_count' => 'required|integer|min:1',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Handle file upload
-        $coverImagePath = null;
-        if ($request->hasFile('cover_image')) {
-            $image = $request->file('cover_image');
-            $imageName = time() . '_' . Str::slug($validated['title']) . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('public/covers', $imageName);
-            $coverImagePath = 'covers/' . $imageName;
-        }
+        $coverImagePath = $request->hasFile('cover_image')
+            ? $this->uploadImage($request->file('cover_image'), $validated['title'], 'covers')
+            : null;
 
         $resource = Resource::create([
             'title' => $validated['title'],
@@ -126,13 +123,36 @@ class ResourceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Resource $resource)
+    public function show(Request $request, Resource $resource)
     {
-        $resource->load(['category', 'publisher', 'authors', 'copies' => function ($query) {
-            $query->with('activeLoan.member.user');
-        }]);
+        $resource->load(['category', 'publisher', 'authors']);
 
-        return view('admin.resources.show', compact('resource'));
+        // Get total counts for statistics (all copies)
+        $allCopiesCount = $resource->copies()->count();
+        $availableCount = $resource->copies()->where('status', 'available')->count();
+        $borrowedCount = $resource->copies()->where('status', 'borrowed')->count();
+        $reservedCount = $resource->copies()->where('status', 'reserved')->count();
+
+        // Get paginated copies with search
+        $copiesQuery = $resource->copies()->with('activeLoan.member.user');
+
+        // Search by barcode or copy number
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $copiesQuery->where(function ($q) use ($search) {
+                $q->where('copy_number', 'like', "%{$search}%")
+                    ->orWhere('barcode', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $copiesQuery->where('status', $request->status);
+        }
+
+        $copies = $copiesQuery->orderBy('copy_number')->paginate(10);
+
+        return view('admin.resources.show', compact('resource', 'copies', 'allCopiesCount', 'availableCount', 'borrowedCount', 'reservedCount'));
     }
 
     /**
@@ -154,14 +174,14 @@ class ResourceController extends Controller
     public function update(Request $request, Resource $resource)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|string',
             'isbn' => ['nullable', 'string', Rule::unique('resources')->ignore($resource->id)],
             'resource_type' => 'required|in:book,journal,magazine,dvd,cd,research_paper,ebook,audiobook',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
             'publisher_id' => 'nullable|exists:publishers,id',
-            'publication_year' => 'nullable|integer|min:1000|max:' . (date('Y') + 1),
-            'language' => 'nullable|string|max:10',
+            'publication_year' => 'nullable|integer',
+            'language' => 'nullable|string',
             'pages' => 'nullable|integer|min:1',
             'status' => 'required|in:available,unavailable,archived',
             'authors' => 'nullable|array',
@@ -171,24 +191,13 @@ class ResourceController extends Controller
         ]);
 
         // Handle image upload or removal
-        $coverImagePath = $resource->cover_image;
-        if ($request->hasFile('cover_image')) {
-            // Delete old image
-            if ($resource->cover_image && Storage::exists('public/' . $resource->cover_image)) {
-                Storage::delete('public/' . $resource->cover_image);
-            }
-            // Upload new image
-            $image = $request->file('cover_image');
-            $imageName = time() . '_' . Str::slug($validated['title']) . '.' . $image->getClientOriginalExtension();
-            $image->storeAs('public/covers', $imageName);
-            $coverImagePath = 'covers/' . $imageName;
-        } elseif (!empty($validated['remove_cover_image'])) {
-            // Remove image
-            if ($resource->cover_image && Storage::exists('public/' . $resource->cover_image)) {
-                Storage::delete('public/' . $resource->cover_image);
-            }
-            $coverImagePath = null;
-        }
+        $coverImagePath = $this->updateImage(
+            $request->file('cover_image'),
+            $resource->cover_image,
+            $validated['title'],
+            'covers',
+            !empty($validated['remove_cover_image'])
+        );
 
         $resource->update([
             'title' => $validated['title'],
