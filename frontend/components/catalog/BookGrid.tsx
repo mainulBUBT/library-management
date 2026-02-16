@@ -29,16 +29,20 @@ interface BookGridProps {
 export default function BookGrid({ resources, isLoading = false }: BookGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
-            <div className="aspect-[4/3] bg-slate-100 animate-pulse" />
-            <div className="p-4">
-              <div className="h-5 w-24 bg-slate-100 rounded animate-pulse mb-2" />
-              <div className="h-4 w-full bg-slate-100 rounded animate-pulse mb-2" />
-              <div className="h-4 w-2/3 bg-slate-100 rounded animate-pulse mb-2" />
-              <div className="h-4 w-full bg-slate-100 rounded animate-pulse mb-4" />
-              <div className="h-10 w-full bg-slate-100 rounded-lg animate-pulse" />
+          <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 h-[420px] flex flex-col">
+            <div className="aspect-[3/4] bg-slate-100 animate-pulse" />
+            <div className="p-4 flex-1 flex flex-col">
+              <div className="h-6 w-3/4 bg-slate-100 rounded animate-pulse mb-2" />
+              <div className="h-4 w-1/2 bg-slate-100 rounded animate-pulse mb-6" />
+              <div className="mt-auto">
+                <div className="h-6 w-24 bg-slate-100 rounded-full animate-pulse mb-4" />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="h-9 bg-slate-100 rounded-lg animate-pulse" />
+                  <div className="h-9 bg-slate-100 rounded-lg animate-pulse" />
+                </div>
+              </div>
             </div>
           </div>
         ))}
@@ -48,20 +52,20 @@ export default function BookGrid({ resources, isLoading = false }: BookGridProps
 
   if (resources.length === 0) {
     return (
-      <div className="text-center py-16">
-        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 border-dashed">
+        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
           <BookOpen className="w-8 h-8 text-slate-300" />
         </div>
         <h3 className="text-lg font-semibold text-slate-900 mb-2">No resources found</h3>
-        <p className="text-slate-500 text-sm">
-          Try adjusting your search terms or filters to find what you're looking for.
+        <p className="text-slate-500 text-sm max-w-sm mx-auto">
+          We couldn't find any books matching your search. Try adjusting your filters or search terms.
         </p>
       </div>
     )
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
       {resources.map((resource) => (
         <BookCard
           key={resource.id}

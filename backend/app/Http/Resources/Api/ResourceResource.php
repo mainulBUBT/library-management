@@ -5,6 +5,8 @@ namespace App\Http\Resources\Api;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+use Illuminate\Support\Facades\Storage;
+
 class ResourceResource extends JsonResource
 {
     /**
@@ -22,15 +24,20 @@ class ResourceResource extends JsonResource
             'isbn' => $this->isbn,
             'publication_year' => $this->publication_year,
             'resource_type' => $this->resource_type,
-            'cover_image' => $this->cover_image,
+            'cover_image' => $this->cover_image ? Storage::url($this->cover_image) : null,
             'category' => $this->whenLoaded('category', fn() => [
                 'id' => $this->category->id,
                 'name' => $this->category->name,
             ]),
             'author' => $this->whenLoaded('author', fn() => [
                 'id' => $this->author->id,
-                'name' => $this->author->full_name,
+                'name' => $this->author->name,
             ]),
+            'authors' => $this->whenLoaded('authors', fn() => $this->authors->map(fn($author) => [
+                'id' => $author->id,
+                'name' => $author->name,
+                'role' => $author->pivot?->role,
+            ])),
             'publisher' => $this->whenLoaded('publisher', fn() => [
                 'id' => $this->publisher->id,
                 'name' => $this->publisher->name,

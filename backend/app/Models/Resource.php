@@ -74,6 +74,22 @@ class Resource extends Model
     }
 
     /**
+     * Get the first author (for compatibility with singular author usage).
+     */
+    public function author(): BelongsToMany
+    {
+        return $this->authors()->limit(1);
+    }
+
+    /**
+     * Accessor for the first author.
+     */
+    public function getAuthorAttribute()
+    {
+        return $this->authors->first();
+    }
+
+    /**
      * Get the copies for the resource.
      */
     public function copies(): HasMany

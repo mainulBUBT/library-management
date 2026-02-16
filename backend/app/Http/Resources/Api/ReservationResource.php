@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ReservationResource extends JsonResource
 {
@@ -23,8 +24,8 @@ class ReservationResource extends JsonResource
             'resource' => $this->whenLoaded('resource', fn() => [
                 'id' => $this->resource->id,
                 'title' => $this->resource->title,
-                'cover_image' => $this->resource->cover_image,
-                'author' => $this->resource->author?->full_name,
+                'cover_image' => $this->resource->cover_image ? Storage::url($this->resource->cover_image) : null,
+                'author' => $this->resource->author?->name,
             ]),
         ];
     }

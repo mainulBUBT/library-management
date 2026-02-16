@@ -14,7 +14,7 @@ class CatalogController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Resource::query()->with(['category', 'author', 'publisher']);
+        $query = Resource::query()->with(['category', 'author', 'publisher', 'copies']);
 
         // Filter by category
         if ($request->has('category_id')) {
@@ -23,7 +23,9 @@ class CatalogController extends Controller
 
         // Filter by author
         if ($request->has('author_id')) {
-            $query->where('author_id', $request->author_id);
+            $query->whereHas('authors', function ($q) use ($request) {
+                $q->where('authors.id', $request->author_id);
+            });
         }
 
         // Filter by type

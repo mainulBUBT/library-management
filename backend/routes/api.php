@@ -8,7 +8,6 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\LoanController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\FineController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,18 +26,18 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
 
-    // Protected endpoints (Sanctum)
+    // Catalog - publicly accessible for browsing
+    Route::get('/catalog', [CatalogController::class, 'index']);
+    Route::get('/catalog/{id}', [CatalogController::class, 'show']);
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories/{id}', [CategoryController::class, 'show']);
+    Route::get('/authors', [AuthorController::class, 'index']);
+    Route::get('/authors/{id}', [AuthorController::class, 'show']);
+
+    // Protected endpoints (require authentication)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
-
-        // Catalog - browse resources (public for authenticated users)
-        Route::get('/catalog', [CatalogController::class, 'index']);
-        Route::get('/catalog/{id}', [CatalogController::class, 'show']);
-        Route::get('/categories', [CategoryController::class, 'index']);
-        Route::get('/categories/{id}', [CategoryController::class, 'show']);
-        Route::get('/authors', [AuthorController::class, 'index']);
-        Route::get('/authors/{id}', [AuthorController::class, 'show']);
 
         // Member profile
         Route::get('/profile', [ProfileController::class, 'show']);
