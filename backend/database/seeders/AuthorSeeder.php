@@ -35,6 +35,19 @@ class AuthorSeeder extends Seeder
             ['name' => 'Harper Lee', 'bio' => 'American novelist', 'birth_date' => '1926-04-28', 'nationality' => 'American'],
             ['name' => 'J.R.R. Tolkien', 'bio' => 'English writer and philologist', 'birth_date' => '1892-01-03', 'nationality' => 'English'],
             ['name' => 'C.S. Lewis', 'bio' => 'British writer and theologian', 'birth_date' => '1898-11-29', 'nationality' => 'British'],
+            ['name' => 'F. Scott Fitzgerald', 'bio' => 'American novelist', 'birth_date' => '1896-09-24', 'nationality' => 'American'],
+            ['name' => 'J.D. Salinger', 'bio' => 'American writer', 'birth_date' => '1919-01-01', 'nationality' => 'American'],
+            ['name' => 'Aldous Huxley', 'bio' => 'English writer and philosopher', 'birth_date' => '1894-07-26', 'nationality' => 'English'],
+            ['name' => 'Robert C. Martin', 'bio' => 'American software engineer', 'birth_date' => '1952-12-05', 'nationality' => 'American'],
+            ['name' => 'Thomas H. Cormen', 'bio' => 'American computer scientist', 'birth_date' => '1956-01-01', 'nationality' => 'American'],
+            ['name' => 'Stephen Hawking', 'bio' => 'English theoretical physicist', 'birth_date' => '1942-01-08', 'nationality' => 'British'],
+            ['name' => 'Sun Tzu', 'bio' => 'Chinese general and military strategist', 'birth_date' => null, 'nationality' => 'Chinese'],
+            ['name' => 'Yuval Noah Harari', 'bio' => 'Israeli public intellectual and historian', 'birth_date' => '1976-02-24', 'nationality' => 'Israeli'],
+            ['name' => 'Anne Frank', 'bio' => 'German-Dutch diarist', 'birth_date' => '1929-06-12', 'nationality' => 'German'],
+            ['name' => 'Paulo Coelho', 'bio' => 'Brazilian lyricist and novelist', 'birth_date' => '1947-08-24', 'nationality' => 'Brazilian'],
+            ['name' => 'Daniel Kahneman', 'bio' => 'Israeli-American psychologist', 'birth_date' => '1934-03-05', 'nationality' => 'Israeli-American'],
+            ['name' => 'Eric Ries', 'bio' => 'American entrepreneur and author', 'birth_date' => '1978-09-22', 'nationality' => 'American'],
+            ['name' => 'Frank Herbert', 'bio' => 'American science fiction author', 'birth_date' => '1920-10-08', 'nationality' => 'American'],
         ];
 
         foreach ($authors as $authorData) {

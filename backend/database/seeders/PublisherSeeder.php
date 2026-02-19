@@ -27,6 +27,14 @@ class PublisherSeeder extends Seeder
             ['name' => 'Pearson Education', 'website_url' => 'https://www.pearson.com'],
             ['name' => 'Wiley', 'website_url' => 'https://www.wiley.com'],
             ['name' => 'Bloomsbury Publishing', 'website_url' => 'https://www.bloomsbury.com'],
+            ['name' => 'Scribner', 'website_url' => 'https://www.scribnerbooks.com'],
+            ['name' => 'Little, Brown and Company', 'website_url' => 'https://www.littlebrown.com'],
+            ['name' => 'Harper Perennial', 'website_url' => 'https://www.harpercollins.com/pages/harper-perennial'],
+            ['name' => 'MIT Press', 'website_url' => 'https://mitpress.mit.edu'],
+            ['name' => 'Bantam', 'website_url' => 'https://www.penguinrandomhouse.com/imprints/3H/bantam'],
+            ['name' => 'Farrar, Straus and Giroux', 'website_url' => 'https://us.macmillan.com/farrarstrausgiroux'],
+            ['name' => 'Currency', 'website_url' => 'https://www.penguinrandomhouse.com/imprints/C6/currency'],
+            ['name' => 'Ace', 'website_url' => 'https://www.penguinrandomhouse.com/imprints/AC/ace'],
         ];
 
         foreach ($publishers as $publisher) {
