@@ -29,20 +29,13 @@ interface BookGridProps {
 export default function BookGrid({ resources, isLoading = false }: BookGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 h-[420px] flex flex-col">
-            <div className="aspect-[3/4] bg-slate-100 animate-pulse" />
-            <div className="p-4 flex-1 flex flex-col">
-              <div className="h-6 w-3/4 bg-slate-100 rounded animate-pulse mb-2" />
-              <div className="h-4 w-1/2 bg-slate-100 rounded animate-pulse mb-6" />
-              <div className="mt-auto">
-                <div className="h-6 w-24 bg-slate-100 rounded-full animate-pulse mb-4" />
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="h-9 bg-slate-100 rounded-lg animate-pulse" />
-                  <div className="h-9 bg-slate-100 rounded-lg animate-pulse" />
-                </div>
-              </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
+          <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-100 flex flex-col">
+            <div className="aspect-[2/3] bg-slate-100 animate-pulse" />
+            <div className="p-3">
+              <div className="h-3.5 w-full bg-slate-100 rounded animate-pulse mb-1.5" />
+              <div className="h-3 w-2/3 bg-slate-100 rounded animate-pulse" />
             </div>
           </div>
         ))}
@@ -65,20 +58,16 @@ export default function BookGrid({ resources, isLoading = false }: BookGridProps
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
       {resources.map((resource) => (
         <BookCard
           key={resource.id}
           id={resource.id}
           title={resource.title}
           author={resource.author}
-          description={resource.description}
           resourceType={resource.resource_type}
           availableCopies={resource.available_copies}
           coverImage={resource.cover_image}
-          isbn={resource.isbn}
-          publishedYear={resource.published_year}
-          category={resource.category}
         />
       ))}
     </div>

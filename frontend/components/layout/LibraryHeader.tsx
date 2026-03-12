@@ -108,7 +108,7 @@ export default function LibraryHeader() {
                                 </Link>
                                 <Link
                                     href="/register"
-                                    className="px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors shadow-sm"
+                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm hover:shadow"
                                 >
                                     Get Started
                                 </Link>
@@ -186,7 +186,7 @@ export default function LibraryHeader() {
                                     </Link>
                                     <Link
                                         href="/register"
-                                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg"
+                                        className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg"
                                         onClick={() => setIsMenuOpen(false)}
                                     >
                                         Register

@@ -122,11 +122,11 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
 
       <main className="flex-1">
         {/* Breadcrumb */}
-        <div className="bg-white border-b border-slate-200">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-3">
+        <div className="bg-gradient-to-r from-slate-50 to-white border-b border-slate-200">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-4">
             <Link
               href="/catalog"
-              className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900"
+              className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-indigo-600 font-medium transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Catalog
@@ -138,7 +138,7 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
           <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
             {/* Book Cover */}
             <div className="flex flex-col items-center">
-              <div className="relative aspect-[2/3] w-full max-w-[280px] bg-slate-100 rounded-lg overflow-hidden shadow-lg">
+              <div className="relative aspect-[2/3] w-full max-w-[280px] bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl overflow-hidden shadow-2xl border border-slate-200">
                 {imageUrl ? (
                   <Image
                     src={imageUrl}
@@ -148,7 +148,7 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
                     sizes="(max-width: 768px) 280px, 280px"
                   />
                 ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-slate-50">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-gradient-to-br from-slate-50 to-slate-100">
                     <BookOpen className="w-16 h-16 text-slate-300 mb-2" />
                     <span className="text-sm text-slate-400">No Cover Available</span>
                   </div>
@@ -156,15 +156,15 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
               </div>
 
               {/* Availability Badge */}
-              <div className={`mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg border ${
+              <div className={`mt-6 inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl border-2 shadow-lg ${
                 isAvailable
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                  : 'bg-amber-50 border-amber-200 text-amber-700'
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-emerald-100'
+                  : 'bg-amber-50 border-amber-300 text-amber-700 shadow-amber-100'
               }`}>
-                <span className={`w-2 h-2 rounded-full ${
-                  isAvailable ? 'bg-emerald-500' : 'bg-amber-500'
+                <span className={`w-2.5 h-2.5 rounded-full ${
+                  isAvailable ? 'bg-emerald-500 shadow-md shadow-emerald-500/50' : 'bg-amber-500 shadow-md shadow-amber-500/50'
                 }`} />
-                <span className="text-sm font-medium">
+                <span className="text-sm font-semibold">
                   {isAvailable
                     ? `${book.available_copies} ${book.available_copies === 1 ? 'Copy' : 'Copies'} Available`
                     : 'Currently Unavailable'
@@ -176,32 +176,31 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
             {/* Book Details */}
             <div>
               {/* Type Badge */}
-              <div className="mb-3">
+              <div className="mb-4">
                 <TypeBadge type={book.resource_type} />
               </div>
 
               {/* Title */}
-              <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 mb-2">
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
                 {book.title}
               </h1>
 
               {book.subtitle && (
-                <p className="text-lg text-slate-600 mb-4">{book.subtitle}</p>
+                <p className="text-lg text-indigo-600 font-medium mb-6">{book.subtitle}</p>
               )}
 
               {/* Author & Category */}
-              <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-slate-600">
+              <div className="flex flex-wrap items-center gap-3 mb-8">
                 {book.author && (
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-lg">
                     <User className="w-4 h-4" />
-                    <span>{book.author.name}</span>
+                    <span className="font-medium">{book.author.name}</span>
                   </div>
                 )}
                 {book.category && (
-                  <>
-                    <span>•</span>
-                    <span>{book.category.name}</span>
-                  </>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg">
+                    <span className="font-medium">{book.category.name}</span>
+                  </div>
                 )}
               </div>
 
@@ -231,41 +230,57 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
                 </div>
               )}
 
-              {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              {/* Details Grid - Card Based */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 {book.isbn && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Barcode className="w-4 h-4 text-slate-400" />
-                    <div>
-                      <span className="text-slate-500">ISBN</span>
-                      <p className="text-slate-900 font-medium">{book.isbn}</p>
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <Barcode className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500 uppercase font-semibold tracking-wide">ISBN</p>
+                        <p className="text-sm font-semibold text-slate-900">{book.isbn}</p>
+                      </div>
                     </div>
                   </div>
                 )}
                 {book.published_year && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="w-4 h-4 text-slate-400" />
-                    <div>
-                      <span className="text-slate-500">Published</span>
-                      <p className="text-slate-900 font-medium">{book.published_year}</p>
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500 uppercase font-semibold tracking-wide">Published</p>
+                        <p className="text-sm font-semibold text-slate-900">{book.published_year}</p>
+                      </div>
                     </div>
                   </div>
                 )}
                 {book.publisher && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Building2 className="w-4 h-4 text-slate-400" />
-                    <div>
-                      <span className="text-slate-500">Publisher</span>
-                      <p className="text-slate-900 font-medium">{book.publisher.name}</p>
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <Building2 className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500 uppercase font-semibold tracking-wide">Publisher</p>
+                        <p className="text-sm font-semibold text-slate-900">{book.publisher.name}</p>
+                      </div>
                     </div>
                   </div>
                 )}
                 {book.resource_type && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Bookmark className="w-4 h-4 text-slate-400" />
-                    <div>
-                      <span className="text-slate-500">Type</span>
-                      <p className="text-slate-900 font-medium capitalize">{book.resource_type.replace('_', ' ')}</p>
+                  <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <Bookmark className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500 uppercase font-semibold tracking-wide">Type</p>
+                        <p className="text-sm font-semibold text-slate-900 capitalize">{book.resource_type.replace('_', ' ')}</p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -276,17 +291,17 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
                 <button
                   onClick={handleReserve}
                   disabled={reserveMutation.isPending || !isAvailable}
-                  className={`flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                  className={`flex-1 inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-semibold transition-all ${
                     !isAvailable
                       ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                      : 'bg-slate-900 text-white hover:bg-slate-800'
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 shadow-lg'
                   }`}
                 >
                   {reserveMutation.isPending ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <Bookmark className="w-4 h-4" />
+                      <Bookmark className="w-5 h-5" />
                       {isAvailable ? 'Reserve This Book' : 'Not Available'}
                     </>
                   )}
@@ -295,7 +310,7 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
                 {isAuthenticated && (
                   <Link
                     href="/dashboard?tab=reservations"
-                    className="px-6 py-3 rounded-lg font-medium border border-slate-300 text-slate-700 hover:bg-slate-50 text-center transition-all"
+                    className="px-8 py-4 rounded-xl font-semibold border-2 border-slate-200 text-slate-700 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50 text-center transition-all hover:shadow-md"
                   >
                     My Reservations
                   </Link>
@@ -317,13 +332,13 @@ export default function BookDetailsPage({ params }: BookDetailsProps) {
           {/* All Authors Section */}
           {book.authors && book.authors.length > 0 && (
             <div className="mt-12 pt-8 border-t border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Author{book.authors.length > 1 ? 's' : ''}</h2>
+              <h2 className="text-lg font-bold text-slate-900 mb-5">Author{book.authors.length > 1 ? 's' : ''}</h2>
               <div className="flex flex-wrap gap-3">
                 {book.authors.map((author: any) => (
                   <Link
                     key={author.id}
                     href={`/catalog?author=${author.id}`}
-                    className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 hover:border-slate-300 hover:text-slate-900 transition-all"
+                    className="px-5 py-2.5 bg-white border-2 border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50 transition-all hover:shadow-md"
                   >
                     {author.name}
                   </Link>

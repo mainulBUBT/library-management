@@ -5,18 +5,18 @@
    ============================================ */
 
 :root {
-  /* Color Palette - Professional Navy/Indigo Theme */
-  --library-primary: #0f172a;
-  --library-primary-dark: #020617;
-  --library-primary-light: #1e293b;
-  --library-accent: #334155;
-  --library-accent-light: #475569;
+  /* Color Palette - Indigo Theme (matching admin panel) */
+  --library-primary: #4f46e5;
+  --library-primary-dark: #4338ca;
+  --library-primary-light: #6366f1;
+  --library-accent: #818cf8;
+  --library-accent-light: #a5b4fc;
   --library-text: #1e293b;
   --library-text-dark: #0f172a;
   --library-text-muted: #64748b;
   --library-border: #e2e8f0;
-  --library-shadow: rgba(15, 23, 42, 0.08);
-  --library-shadow-lg: rgba(15, 23, 42, 0.12);
+  --library-shadow: rgba(79, 70, 229, 0.08);
+  --library-shadow-lg: rgba(79, 70, 229, 0.12);
 
   /* Semantic Colors */
   --color-background: #f8fafc;
@@ -488,6 +488,16 @@ h4 {
   }
 }
 
+/* Shimmer Animation for Hover Effects */
+@keyframes shimmerHover {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
 /* Fade In Animation */
 @keyframes fadeIn {
   from {
@@ -520,6 +530,45 @@ h4 {
   width: 3px;
   background: var(--library-primary);
   border-radius: 2px;
+}
+
+/* ============================================
+   ADDITIONAL ANIMATIONS
+   ============================================ */
+
+/* Stagger Children Animation */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 350ms; }
+
+/* Hover Lift Effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* Button Press Effect */
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+/* Shimmer Effect for Cards */
+.animate-shimmer {
+  animation: shimmerHover 2s infinite;
 }
 
 /* ============================================

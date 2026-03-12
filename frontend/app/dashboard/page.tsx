@@ -1,14 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
-import LibraryHeader from '@/components/layout/LibraryHeader'
-import LibraryFooter from '@/components/layout/LibraryFooter'
 import {
   Bookmark,
   BookOpen,
@@ -16,33 +12,26 @@ import {
   Clock,
   User,
   Check,
-  X,
   Loader2,
   AlertCircle,
-  LogOut,
+  Edit,
+  Key,
 } from 'lucide-react'
 
-type TabType = 'reservations' | 'loans' | 'profile'
+import LoanCard from '@/components/dashboard/LoanCard'
+import ReservationCard from '@/components/dashboard/ReservationCard'
+import FinesList from '@/components/dashboard/FinesList'
+import ProfileEditForm from '@/components/dashboard/ProfileEditForm'
+import PasswordChangeForm from '@/components/dashboard/PasswordChangeForm'
+
+type ProfileTabType = 'view' | 'edit' | 'password'
 
 export default function DashboardPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const queryClient = useQueryClient()
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const user = useAuthStore((state) => state.user)
-  const logout = useAuthStore((state) => state.logout)
-
-  const [activeTab, setActiveTab] = useState<TabType>(
-    (searchParams.get('tab') as TabType) || 'reservations'
-  )
+  const [profileTab, setProfileTab] = useState<ProfileTabType>('view')
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login?redirect=/dashboard')
-    }
-  }, [isAuthenticated, router])
 
   // Fetch user reservations
   const { data: reservationsData, isLoading: reservationsLoading, refetch: refetchReservations } = useQuery({
@@ -59,6 +48,16 @@ export default function DashboardPage() {
     queryKey: ['my-loans'],
     queryFn: async () => {
       const response = await api.get('/my-loans')
+      return response.data
+    },
+    enabled: isAuthenticated,
+  })
+
+  // Fetch user fines
+  const { data: finesData } = useQuery({
+    queryKey: ['my-fines'],
+    queryFn: async () => {
+      const response = await api.get('/my-fines')
       return response.data
     },
     enabled: isAuthenticated,
@@ -106,371 +105,290 @@ export default function DashboardPage() {
     renewMutation.mutate(loanId)
   }
 
-  const handleLogout = () => {
-    logout()
-    router.push('/')
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
-        <LibraryHeader />
-        <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-        </main>
-      </div>
-    )
-  }
-
   const reservations = reservationsData?.data || []
   const loans = loansData?.data || []
+  const fines = finesData?.data || []
   const activeLoans = loans.filter((l: any) => l.status === 'active')
   const pendingReservations = reservations.filter((r: any) => r.status === 'pending' || r.status === 'ready')
+  const unpaidFines = fines.filter((f: any) => f.balance > 0)
 
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { color: string; bg: string; label: string }> = {
-      pending: { color: 'text-amber-700', bg: 'bg-amber-50', label: 'Pending' },
-      ready: { color: 'text-blue-700', bg: 'bg-blue-50', label: 'Ready to Pick Up' },
-      fulfilled: { color: 'text-emerald-700', bg: 'bg-emerald-50', label: 'Fulfilled' },
-      cancelled: { color: 'text-slate-500', bg: 'bg-slate-100', label: 'Cancelled' },
-      expired: { color: 'text-red-700', bg: 'bg-red-50', label: 'Expired' },
-      active: { color: 'text-emerald-700', bg: 'bg-emerald-50', label: 'Active' },
-      returned: { color: 'text-slate-500', bg: 'bg-slate-100', label: 'Returned' },
-      overdue: { color: 'text-red-700', bg: 'bg-red-50', label: 'Overdue' },
-    }
-    const s = statusMap[status] || { color: 'text-slate-700', bg: 'bg-slate-100', label: status }
-    return (
-      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${s.bg} ${s.color}`}>
-        {s.label}
-      </span>
-    )
-  }
-
-  const getImageUrl = (imagePath: string | null | undefined) => {
-    if (!imagePath) return null
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath
-    }
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'http://localhost:8000'
-    return `${baseUrl}/${imagePath.startsWith('/') ? imagePath.slice(1) : imagePath}`
-  }
+  // Filter out loans/reservations without required data
+  const validLoans = loans.filter((l: any) => l.copy?.resource)
+  const validReservations = reservations.filter((r: any) => r.resource)
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--color-background)]">
-      <LibraryHeader />
+    <div className="min-h-screen">
+      {/* Page Header */}
+      <div className="bg-gradient-to-r from-indigo-50 to-white border-b border-slate-200">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">
+            My Library
+          </h1>
+          <p className="text-slate-600 mt-2">
+            Manage your loans, reservations, and account
+          </p>
+        </div>
+      </div>
 
-      <main className="flex-1">
-        {/* Dashboard Header */}
-        <div className="bg-white border-b border-slate-200">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-semibold text-slate-900">My Dashboard</h1>
-                <p className="text-slate-500 text-sm">Welcome back, {user?.name}</p>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        {/* Alert Message */}
+        {message && (
+          <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 shadow-sm ${
+            message.type === 'success'
+              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+              : 'bg-red-50 text-red-800 border border-red-200'
+          }`}>
+            {message.type === 'success' ? (
+              <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+            )}
+            <p className="text-sm font-medium">{message.text}</p>
+          </div>
+        )}
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="group relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-5 text-white hover:shadow-lg transition-all">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <BookOpen className="w-6 h-6" />
+                </div>
               </div>
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg hover:bg-slate-50"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </button>
+              <p className="text-3xl font-bold">{activeLoans.length}</p>
+              <p className="text-emerald-100 text-sm font-medium">Active Loans</p>
+            </div>
+          </div>
+
+          <div className="group relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-white hover:shadow-lg transition-all">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <Bookmark className="w-6 h-6" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold">{pendingReservations.length}</p>
+              <p className="text-blue-100 text-sm font-medium">Reservations</p>
+            </div>
+          </div>
+
+          <div className="group relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-5 text-white hover:shadow-lg transition-all">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <AlertCircle className="w-6 h-6" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold">{unpaidFines.length}</p>
+              <p className="text-amber-100 text-sm font-medium">Unpaid Fines</p>
+            </div>
+          </div>
+
+          <div className="group relative overflow-hidden bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-5 text-white hover:shadow-lg transition-all">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-300" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <User className="w-6 h-6" />
+                </div>
+              </div>
+              <p className="text-sm font-bold capitalize">{user?.member_type || 'Standard'}</p>
+              <p className="text-indigo-100 text-sm font-medium">Member Type</p>
             </div>
           </div>
         </div>
 
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
-          {/* Alert Message */}
-          {message && (
-            <div className={`mb-6 p-4 rounded-lg flex items-start gap-3 ${
-              message.type === 'success'
-                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                : 'bg-red-50 text-red-800 border border-red-200'
-            }`}>
-              {message.type === 'success' ? (
-                <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              ) : (
-                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-              )}
-              <p className="text-sm">{message.text}</p>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Current Loans Section */}
+          <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-slate-900">Current Loans</h2>
+              <Link href="/catalog" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+                Browse More →
+              </Link>
             </div>
-          )}
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-5 h-5 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold text-slate-900">{activeLoans.length}</p>
-                  <p className="text-xs text-slate-500">Active Loans</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Bookmark className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold text-slate-900">{pendingReservations.length}</p>
-                  <p className="text-xs text-slate-500">Reservations</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-2 border-b border-slate-200 mb-6">
-            <button
-              onClick={() => setActiveTab('reservations')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'reservations'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              My Reservations
-            </button>
-            <button
-              onClick={() => setActiveTab('loans')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'loans'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              My Loans
-            </button>
-            <button
-              onClick={() => setActiveTab('profile')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'profile'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              Profile
-            </button>
-          </div>
-
-          {/* Reservations Tab */}
-          {activeTab === 'reservations' && (
-            <div>
-              {reservationsLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
-                </div>
-              ) : reservations.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
-                  <Bookmark className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <h3 className="text-lg font-medium text-slate-900 mb-1">No Reservations Yet</h3>
-                  <p className="text-slate-500 text-sm mb-4">
-                    Browse our catalog and reserve books you'd like to borrow.
-                  </p>
-                  <Link
-                    href="/catalog"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800"
-                  >
-                    Browse Catalog
-                  </Link>
-                </div>
-              ) : (
-                <div className="grid gap-4">
-                  {reservations.map((reservation: any) => (
-                    <div
-                      key={reservation.id}
-                      className="bg-white border border-slate-200 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Book Cover Thumbnail */}
-                        <div className="w-16 h-20 bg-slate-100 rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
-                          {reservation.resource?.cover_image ? (
-                            <Image
-                              src={getImageUrl(reservation.resource.cover_image) || ''}
-                              alt={reservation.resource?.title}
-                              width={64}
-                              height={80}
-                              className="object-cover w-full h-full"
-                            />
-                          ) : (
-                            <BookOpen className="w-6 h-6 text-slate-300" />
-                          )}
-                        </div>
-
-                        <div>
-                          <Link
-                            href={`/catalog/${reservation.resource?.id}`}
-                            className="font-medium text-slate-900 hover:text-slate-700"
-                          >
-                            {reservation.resource?.title}
-                          </Link>
-                          {reservation.resource?.author && (
-                            <p className="text-sm text-slate-500">{reservation.resource.author.name}</p>
-                          )}
-                          <div className="flex items-center gap-3 mt-2">
-                            {getStatusBadge(reservation.status)}
-                            {reservation.expires_at && (
-                              <span className="flex items-center gap-1 text-xs text-slate-400">
-                                <Clock className="w-3 h-3" />
-                                Expires: {new Date(reservation.expires_at).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      {(reservation.status === 'pending' || reservation.status === 'ready') && (
-                        <div className="flex sm:flex-col gap-2">
-                          <button
-                            onClick={() => handleCancelReservation(reservation.id)}
-                            disabled={cancelMutation.isPending}
-                            className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 border border-red-200 rounded hover:bg-red-50 disabled:opacity-50"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Loans Tab */}
-          {activeTab === 'loans' && (
-            <div>
+            <div className="p-4">
               {loansLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
                 </div>
-              ) : loans.length === 0 ? (
-                <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
-                  <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <h3 className="text-lg font-medium text-slate-900 mb-1">No Loans Yet</h3>
-                  <p className="text-slate-500 text-sm mb-4">
-                    Browse our catalog and borrow books to read.
-                  </p>
-                  <Link
-                    href="/catalog"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800"
-                  >
-                    Browse Catalog
-                  </Link>
+              ) : validLoans.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <BookOpen className="w-6 h-6 text-slate-300" />
+                  </div>
+                  <p className="text-sm text-slate-500">No loans yet</p>
                 </div>
               ) : (
-                <div className="grid gap-4">
-                  {loans.map((loan: any) => (
-                    <div
+                <div className="space-y-3">
+                  {validLoans.slice(0, 3).map((loan: any) => (
+                    <LoanCard
                       key={loan.id}
-                      className="bg-white border border-slate-200 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-                    >
-                      <div className="flex items-center gap-4">
-                        {/* Book Cover Thumbnail */}
-                        <div className="w-16 h-20 bg-slate-100 rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
-                          {loan.copy?.resource?.cover_image ? (
-                            <Image
-                              src={getImageUrl(loan.copy.resource.cover_image) || ''}
-                              alt={loan.copy?.resource?.title}
-                              width={64}
-                              height={80}
-                              className="object-cover w-full h-full"
-                            />
-                          ) : (
-                            <BookOpen className="w-6 h-6 text-slate-300" />
-                          )}
-                        </div>
-
-                        <div>
-                          <Link
-                            href={`/catalog/${loan.copy?.resource?.id}`}
-                            className="font-medium text-slate-900 hover:text-slate-700"
-                          >
-                            {loan.copy?.resource?.title}
-                          </Link>
-                          {loan.copy?.resource?.author && (
-                            <p className="text-sm text-slate-500">{loan.copy.resource.author.name}</p>
-                          )}
-                          <div className="flex items-center gap-3 mt-2">
-                            {getStatusBadge(loan.status)}
-                            {loan.due_date && (
-                              <span className="flex items-center gap-1 text-xs text-slate-400">
-                                <Calendar className="w-3 h-3" />
-                                Due: {new Date(loan.due_date).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      {loan.status === 'active' && (
-                        <button
-                          onClick={() => handleRenewLoan(loan.id)}
-                          disabled={renewMutation.isPending}
-                          className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50"
-                        >
-                          Renew
-                        </button>
-                      )}
-                    </div>
+                      loan={loan}
+                      onRenew={handleRenewLoan}
+                      isRenewing={renewMutation.isPending}
+                    />
                   ))}
+                  {validLoans.length > 3 && (
+                    <p className="text-xs text-slate-500 text-center pt-2">
+                      And {validLoans.length - 3} more loan{validLoans.length - 3 > 1 ? 's' : ''}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
-          )}
+          </section>
 
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <div className="max-w-2xl">
-              <div className="bg-white border border-slate-200 rounded-lg p-6">
+          {/* Active Reservations Section */}
+          <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-slate-900">Reservations</h2>
+              <Link href="/catalog" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+                Browse More →
+              </Link>
+            </div>
+            <div className="p-4">
+              {reservationsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+                </div>
+              ) : validReservations.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Bookmark className="w-6 h-6 text-slate-300" />
+                  </div>
+                  <p className="text-sm text-slate-500">No reservations yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {validReservations.slice(0, 3).map((reservation: any) => (
+                    <ReservationCard
+                      key={reservation.id}
+                      reservation={reservation}
+                      onCancel={handleCancelReservation}
+                      isCancelling={cancelMutation.isPending}
+                    />
+                  ))}
+                  {validReservations.length > 3 && (
+                    <p className="text-xs text-slate-500 text-center pt-2">
+                      And {validReservations.length - 3} more reservation{validReservations.length - 3 > 1 ? 's' : ''}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Fines Section - Full Width */}
+          <section className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200">
+              <h2 className="text-lg font-bold text-slate-900">Fines</h2>
+            </div>
+            <div className="p-4">
+              <FinesList />
+            </div>
+          </section>
+        </div>
+
+        {/* Profile Section */}
+        <section className="mt-6 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-900">Profile</h2>
+          </div>
+
+          {/* Profile Sub-Tabs */}
+          <div className="flex gap-2 px-6 pt-4 border-b border-slate-200 overflow-x-auto">
+            {[
+              { key: 'view', label: 'View Profile', icon: User },
+              { key: 'edit', label: 'Edit Profile', icon: Edit },
+              { key: 'password', label: 'Change Password', icon: Key },
+            ].map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setProfileTab(tab.key as ProfileTabType)}
+                  className={`
+                    flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 whitespace-nowrap transition-colors
+                    ${profileTab === tab.key
+                      ? 'border-indigo-600 text-indigo-600'
+                      : 'border-transparent text-slate-500 hover:text-slate-700'
+                    }
+                  `}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="p-6">
+            {/* View Profile */}
+            {profileTab === 'view' && (
+              <div className="bg-slate-50 rounded-xl p-6">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-slate-400" />
+                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <User className="w-8 h-8 text-indigo-600" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900">{user?.name}</h2>
-                    <p className="text-slate-500 text-sm">{user?.email}</p>
+                    <h3 className="text-xl font-bold text-slate-900">{user?.name}</h3>
+                    <p className="text-slate-500">{user?.email}</p>
                   </div>
                 </div>
 
-                <div className="grid gap-4 text-sm">
+                <div className="grid gap-1 sm:grid-cols-2">
                   {user?.phone && (
-                    <div className="flex items-center gap-3 py-3 border-b border-slate-100">
-                      <span className="text-slate-500 w-28">Phone</span>
-                      <span className="text-slate-900">{user.phone}</span>
+                    <div className="flex items-center gap-3 py-3 border-b border-slate-200">
+                      <span className="text-sm font-semibold text-slate-500">Phone</span>
+                      <span className="text-sm text-slate-900">{user.phone}</span>
                     </div>
                   )}
                   {user?.address && (
-                    <div className="flex items-center gap-3 py-3 border-b border-slate-100">
-                      <span className="text-slate-500 w-28">Address</span>
-                      <span className="text-slate-900">{user.address}</span>
+                    <div className="flex items-center gap-3 py-3 border-b border-slate-200">
+                      <span className="text-sm font-semibold text-slate-500">Address</span>
+                      <span className="text-sm text-slate-900">{user.address}</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-3 py-3 border-b border-slate-100">
-                    <span className="text-slate-500 w-28">Member Type</span>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 capitalize">
-                      {user?.member_type}
+                  <div className="flex items-center gap-3 py-3 border-b border-slate-200">
+                    <span className="text-sm font-semibold text-slate-500">Member Type</span>
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 capitalize">
+                      {user?.member_type || 'Standard'}
                     </span>
                   </div>
                   {user?.created_at && (
                     <div className="flex items-center gap-3 py-3">
-                      <span className="text-slate-500 w-28">Member Since</span>
-                      <span className="text-slate-900">{new Date(user.created_at).toLocaleDateString()}</span>
+                      <span className="text-sm font-semibold text-slate-500">Member Since</span>
+                      <span className="text-sm text-slate-900">{new Date(user.created_at).toLocaleDateString()}</span>
                     </div>
                   )}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      </main>
+            )}
 
-      <LibraryFooter />
+            {/* Edit Profile */}
+            {profileTab === 'edit' && (
+              <div className="bg-slate-50 rounded-xl p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Edit Profile</h3>
+                <ProfileEditForm />
+              </div>
+            )}
+
+            {/* Change Password */}
+            {profileTab === 'password' && (
+              <div className="bg-slate-50 rounded-xl p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Change Password</h3>
+                <PasswordChangeForm />
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   )
 }

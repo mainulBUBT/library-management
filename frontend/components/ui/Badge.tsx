@@ -33,7 +33,7 @@ export function TypeBadge({ type, className = '' }: TypeBadgeProps) {
   }
 
   return (
-    <span className={`inline-flex items-center gap-1 rounded bg-slate-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white ${className}`}>
+    <span className={`inline-flex items-center gap-1 rounded bg-indigo-600 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-white shadow-sm ${className}`}>
       {formatType(type)}
     </span>
   )
